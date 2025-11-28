@@ -5,5 +5,4 @@ public class TransactionRecord {
     private int transactionID;
     private String status;
 
-
 }
