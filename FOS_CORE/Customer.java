@@ -11,14 +11,13 @@ public class Customer extends User {
     private ArrayList<Address> addresses;
     private ArrayList<Order> orders;
     private ArrayList<Card> cards;
-    private final IUserData userData = new UserData();
     private ArrayList<CartItem> cart;
 
     public Customer() { }
 
     public Customer(int userID, String email, String passwordHash) {
         super(userID, email, passwordHash);
-        this.phoneNumbers = userData.fetchCustomerPhoneNumbers(this);
+        this.phoneNumbers = IUserData.fetchCustomerPhoneNumbers(this);
         this.addresses = userData.fetchCustomerAddresses(this);
         this.orders = userData.fetchCustomerOrders(this, FOS.getAllRestaurants());
         this.cards = userData.fetchCustomerCards(this);

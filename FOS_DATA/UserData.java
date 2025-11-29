@@ -1,8 +1,6 @@
 package FOS_DATA;
 
 import FOS_CORE.*;
-import FOS_CORE.MenuItem;
-
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -49,6 +47,7 @@ public class UserData implements IUserData {
         }
         return null;
     }
+
     public boolean changeUserPassword(User user, String newHashedPassword){
         int userId = user.getUserID();
         final String sql = "UPDATE User SET password = ? WHERE user_id = ?";
