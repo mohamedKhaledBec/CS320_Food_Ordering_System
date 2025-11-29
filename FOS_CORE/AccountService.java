@@ -1,17 +1,18 @@
 package FOS_CORE;
 
 import java.util.List;
+import FOS_DATA.IUserData;
 
 public class AccountService implements IAccountService {
 
-    private final DatabaseAPI DB = new DatabaseAPI();
+    private final IUserData DB = new FOS_DATA.UserData() ;
     static int userID = 0;
     // Working on it : Mohamed Khaled Becetti
     @Override
     public Customer createCustomerAccount(String email, String phone, String password) {
-        User user = new Customer(userID, email, password);
+        Customer user = new Customer(userID, email, password);
         DB.addNewCustomer(user);
-        DB.addPhoneNumber((Customer)user,phone);
+        DB.addPhoneNumber(user,phone);
         return null;
     }
     //Working on it : Mohamed Khaled Becetti
@@ -22,12 +23,12 @@ public class AccountService implements IAccountService {
     //Working on it : Mohamed Khaled Becetti
     @Override
     public void updateContactInfo(Customer customer, String phone) {
-        // function yet to be implemented by the DATA package interface Not found in the API
+        DB.addPhoneNumber(customer,phone);
     }
     //Working on it : Mohamed Khaled Becetti
     @Override
     public boolean addAddress(Customer customer, Address address) {
-        // function yet to be implemented by the DATA package interface Not found in the API
+        DB.addAddress(customer,address);
         return false;
     }
     //Working on it : Mohamed Khaled Becetti
