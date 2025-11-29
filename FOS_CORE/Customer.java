@@ -1,7 +1,6 @@
 package FOS_CORE;
 
-import FOS_DATA.IUserData;
-import FOS_DATA.UserData;
+
 
 import java.util.ArrayList;
 
@@ -12,16 +11,16 @@ public class Customer extends User {
     private ArrayList<Order> orders;
     private ArrayList<Card> cards;
     private ArrayList<CartItem> cart;
-    private static IUserData userData = new UserData();
 
     public Customer() { }
-
+// Mohamed Khaled Becetti changed the fetching to be from the service class other than the UI class
     public Customer(int userID, String email, String passwordHash) {
         super(userID, email, passwordHash);
-        this.phoneNumbers = userData.fetchCustomerPhoneNumbers(this);
-        this.addresses = userData.fetchCustomerAddresses(this);
-        this.orders = userData.fetchCustomerOrders(this, FOS.getAllRestaurants());
-        this.cards = userData.fetchCustomerCards(this);
+        AccountService accountService = new AccountService();
+        this.phoneNumbers = accountService.fetchCustomerPhoneNumbers(this);
+        this.addresses = accountService.fetchCustomerAddresses(this);
+        this.orders = accountService.fetchCustomerOrders(this, FOS.getAllRestaurants());
+        this.cards = accountService.fetchCustomerCards(this);
     }
 
     public ArrayList<String> getPhoneNumbers() {
@@ -42,6 +41,10 @@ public class Customer extends User {
 
     public ArrayList<Card> getCards() {
         return cards;
+    }
+
+    public IUserData getUserData() {
+        return userData;
     }
 
     public ArrayList<CartItem> getCart() {
