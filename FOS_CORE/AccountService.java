@@ -1,5 +1,6 @@
 package FOS_CORE;
 
+import java.util.ArrayList;
 import java.util.List;
 import FOS_DATA.IUserData;
 
@@ -36,6 +37,12 @@ public class AccountService implements IAccountService {
     public List<Address> getAddresses(Customer customer) {
         return DB.fetchCustomerAddresses(customer);
     }
+    public ArrayList<String> fetchCustomerPhoneNumbers(Customer customer){
+        return DB.fetchCustomerPhoneNumbers(customer);
+    }
+    public ArrayList<Address> fetchCustomerAddresses(Customer customer){
+        return DB.fetchCustomerAddresses(customer);
+    }
     //Working on it : Mohamed Khaled Becetti
     private boolean validateEmailFormat(String email) {
         if (email==null || email.trim().equals("")) {return false;}//empty string
@@ -47,6 +54,19 @@ public class AccountService implements IAccountService {
 
         return true;
     }
+
+    public ArrayList<Order> fetchCustomerOrders(Customer customer, ArrayList<Restaurant> allRestaurants) {
+        return DB.fetchCustomerOrders(customer,allRestaurants);
+    }
+
+    public ArrayList<Card> fetchCustomerCards(Customer customer) {
+        return DB.fetchCustomerCards(customer);
+    }
+
+    // to String Return?
+
+
+
     //Working on it : Mohamed Khaled Becetti
     //private void saveCustomer(Customer customer) {
        // same as create new customer
