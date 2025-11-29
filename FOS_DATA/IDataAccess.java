@@ -4,6 +4,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import FOS_CORE.*;
+import FOS_CORE.MenuItem;
+
 import java.sql.*;
 
 public interface IDataAccess {

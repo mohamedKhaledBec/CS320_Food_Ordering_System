@@ -26,6 +26,10 @@ public class Restaurant {
         return menu;
     }
 
+    public void setMenu(ArrayList<MenuItem> menu) {
+        this.menu = menu;
+    }
+
     public int getRestaurantID() {
         return restaurantID;
     }

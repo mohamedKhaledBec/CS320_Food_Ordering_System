@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface IRestaurantService {
     List<Restaurant> getRestaurants(String city);
-    Menu getMenu(String restaurantID);
+    List<MenuItem> getMenu(int restaurantID);
     List<Restaurant> searchRestaurants(String keyword);
 }

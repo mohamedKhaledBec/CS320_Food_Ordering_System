@@ -3,12 +3,12 @@ package FOS_CORE;
 public class PaymentService implements IPaymentService {
 
     @Override
-    public TransactionRecord processPayment(PaymentDetails cardDetails, double amount) {
+    public TransactionRecord processPayment(IPaymentDetails cardDetails, double amount) {
         // TODO: Implementation
         return null;
     }
 
-    private void validatePaymentDetails(PaymentDetails cardDetails) {
+    private void validatePaymentDetails(IPaymentDetails cardDetails) {
         // TODO: Implementation
     }
 
