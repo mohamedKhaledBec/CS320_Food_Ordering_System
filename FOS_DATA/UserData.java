@@ -11,15 +11,15 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public abstract class UserData {
-    abstract boolean addNewCustomer(User user);
-    abstract User getUserByEmail(String email);
-    abstract boolean changeUserPassword(User user, String newHashedPassword);
-    abstract ArrayList<Card> fetchCustomerCards(Customer customer);
-    abstract boolean addCardToCustomer(Customer customer, Card card);
-    abstract ArrayList<Address> fetchCustomerAddresses(Customer customer);
-    abstract boolean addAddress(Customer customer,Address address);
-    abstract ArrayList<String> fetchCustomerPhoneNumbers(Customer customer);
-    abstract boolean addPhoneNumber(Customer customer, String phoneNumber);
-    abstract ArrayList<Order> fetchCustomerOrders(Customer customer);
-    abstract Order insertCustomerOrder(Customer customer, Order order);
+    public abstract boolean addNewCustomer(User user);
+    public abstract User getUserByEmail(String email);
+    public abstract boolean changeUserPassword(User user, String newHashedPassword);
+    public abstract ArrayList<Card> fetchCustomerCards(Customer customer);
+    public abstract boolean addCardToCustomer(Customer customer, Card card);
+    public abstract ArrayList<Address> fetchCustomerAddresses(Customer customer);
+    public abstract boolean addAddress(Customer customer,Address address);
+    public abstract ArrayList<String> fetchCustomerPhoneNumbers(Customer customer);
+    public abstract boolean addPhoneNumber(Customer customer, String phoneNumber);
+    public abstract ArrayList<Order> fetchCustomerOrders(Customer customer, ArrayList<Restaurant> restaurants);
+    public abstract boolean insertCustomerOrder(Customer customer, Order order, Restaurant restaurant);
 }

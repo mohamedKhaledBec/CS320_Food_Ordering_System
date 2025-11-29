@@ -1,6 +1,7 @@
 package FOS_DATA;
 
 import FOS_CORE.*;
+import FOS_CORE.MenuItem;
 
 import java.awt.*;
 import java.sql.*;
@@ -73,11 +74,11 @@ public class UserDataAccess extends UserData {
             statement.setInt(1, customerId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    String cardNo = resultSet.getString("card_no");
-                    String expiryDate = resultSet.getString("expiry_date");
+                    int cardNumber = resultSet.getInt("card_no");
+                    Date expiryDate = resultSet.getDate("expiry_date");
                     String cardholderName = resultSet.getString("cardholder_name");
                     int cvv = resultSet.getInt("cvv");
-                    cards.add(new Card(cardNo, expiryDate, cardholderName, cvv));
+                    cards.add(new Card(cardNumber, cardholderName, expiryDate, cvv));
                 }
             } catch (SQLException e) {
                 System.out.println("No cards found for the customer");
@@ -93,9 +94,9 @@ public class UserDataAccess extends UserData {
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, customerId);
-            statement.setString(2, card.getCardNo());
-            statement.setString(3, card.getExpiryDate());
-            statement.setString(4, card.getCardholderName());
+            statement.setInt(2, card.getCardNumber());
+            statement.setDate(3, card.getExpiryDate());
+            statement.setString(4, card.getCardHolderName());
             statement.setInt(5, card.getCvv());
             int rowsAffected = statement.executeUpdate();
             return rowsAffected > 0;
@@ -222,8 +223,7 @@ public class UserDataAccess extends UserData {
                             int menuItemId = itemResultSet.getInt("menu_item_id");
                             for (Restaurant restaurant : restaurants) {
                                 if (restaurant.getRestaurantID() == restaurantId) {
-                                    restaurantName = restaurant.getName();
-                                    break;
+                                    restaurantName = restaurant.getRestaurantName();
                                     for (MenuItem menuItem : restaurant.getMenu()) {
                                         if (menuItem.getMenuItemID() == menuItemId) {
                                             int quantity = itemResultSet.getInt("quantity");
@@ -236,8 +236,6 @@ public class UserDataAccess extends UserData {
                         }
                         orders.add(new Order(deliveryAddress, items, date, status, restaurantName, order_id, rating));
                     }
-                } catch(SQLException e){
-                    System.out.println("No orders found for the customer");
                 }
             } catch (SQLException e) {
                 System.out.println("Database failed to fetch customer orders");

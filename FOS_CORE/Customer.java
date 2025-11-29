@@ -20,9 +20,9 @@ public class Customer extends User {
     public Customer(int userID, String email, String passwordHash) {
         super(userID, email, passwordHash);
         this.phoneNumbers = userData.fetchCustomerPhoneNumbers(this);
-        this.addresses = UserDataAccess.fetchCustomerAddresses(this);
-        this.orders = UserDataAccess.fetchCustomerOrders(this);
-        this.cards = UserDataAccess.fetchCustomerCards(this);
+        this.addresses = userData.fetchCustomerAddresses(this);
+        this.orders = userData.fetchCustomerOrders(this, FOS.getAllRestaurants());
+        this.cards = userData.fetchCustomerCards(this);
     }
 
     public ArrayList<String> getPhoneNumbers() {
