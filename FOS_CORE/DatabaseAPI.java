@@ -1,15 +1,15 @@
 package FOS_CORE;
 
-import FOS_DATA.UserData;
+import FOS_DATA.IUserData;
 import java.util.ArrayList;
 
 public class DatabaseAPI {
 
-    private final UserData dao;
+    private final IUserData dao;
 
 
     public DatabaseAPI() {
-        this.dao = new FOS_DATA.UserDataAccess();
+        this.dao = new FOS_DATA.UserData();
     }
 
     public boolean addNewCustomer(User user) {
