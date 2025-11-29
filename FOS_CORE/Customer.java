@@ -12,12 +12,13 @@ public class Customer extends User {
     private ArrayList<Order> orders;
     private ArrayList<Card> cards;
     private ArrayList<CartItem> cart;
+    private static IUserData userData = new UserData();
 
     public Customer() { }
 
     public Customer(int userID, String email, String passwordHash) {
         super(userID, email, passwordHash);
-        this.phoneNumbers = IUserData.fetchCustomerPhoneNumbers(this);
+        this.phoneNumbers = userData.fetchCustomerPhoneNumbers(this);
         this.addresses = userData.fetchCustomerAddresses(this);
         this.orders = userData.fetchCustomerOrders(this, FOS.getAllRestaurants());
         this.cards = userData.fetchCustomerCards(this);
@@ -41,10 +42,6 @@ public class Customer extends User {
 
     public ArrayList<Card> getCards() {
         return cards;
-    }
-
-    public IUserData getUserData() {
-        return userData;
     }
 
     public ArrayList<CartItem> getCart() {

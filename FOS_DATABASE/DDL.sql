@@ -104,9 +104,9 @@ CREATE TABLE Rating (
 
 CREATE TABLE Card (
     customer_id INT,
-    card_no VARCHAR(16) PRIMARY KEY,
+    card_no CHAR(16) PRIMARY KEY,
     card_holder_name VARCHAR(100) NOT NULL,
     expiry_date DATE NOT NULL,
-    cvv VARCHAR(3) NOT NULL,
+    cvv CHAR(3) NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES User(user_id) ON DELETE CASCADE
 );
