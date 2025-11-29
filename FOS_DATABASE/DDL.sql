@@ -64,26 +64,25 @@ CREATE TABLE MenuItem (
     FOREIGN KEY (restaurant_id) REFERENCES Restaurant(restaurant_id) ON DELETE CASCADE
 );
 
-CREATE TABLE CartItem (
-    order_id INT,
-    menu_item_id INT NOT NULL,
-    quantity INT NOT NULL CHECK (quantity > 0),
-    PRIMARY KEY (cart_id, menu_item_id),
-    FOREIGN KEY (cart_id) REFERENCES Cart(cart_id) ON DELETE CASCADE,
-    FOREIGN KEY (menu_item_id) REFERENCES MenuItem(menu_item_id) ON DELETE CASCADE
-);
-
-CREATE TABLE `Order` (
+CREATE TABLE Order (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT NOT NULL,
     restaurant_id INT NOT NULL,
     order_status ENUM('pending', 'preparing', 'sent', 'delivered') NOT NULL default 'preparing',
     order_date DATETIME NOT NULL,
     delivery_address_id INT NOT NULL,
-    FOREIGN KEY (delivery_address) REFERENCES User(user_id) ON DELETE CASCADE,
     FOREIGN KEY (customer_id) REFERENCES User(user_id) ON DELETE CASCADE,
     FOREIGN KEY (restaurant_id) REFERENCES Restaurant(restaurant_id) ON DELETE CASCADE,
     FOREIGN KEY (delivery_address_id) REFERENCES Address(address_id) ON DELETE CASCADE
+);
+
+CREATE TABLE CartItem (
+    order_id INT,
+    menu_item_id INT NOT NULL,
+    quantity INT NOT NULL CHECK (quantity > 0),
+    PRIMARY KEY (order_id, menu_item_id),
+    FOREIGN KEY (order_id) REFERENCES Order(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (menu_item_id) REFERENCES MenuItem(menu_item_id) ON DELETE CASCADE
 );
 
 CREATE TABLE OrderItem (
@@ -91,7 +90,7 @@ CREATE TABLE OrderItem (
     menu_item_id INT NOT NULL,
     quantity INT NOT NULL CHECK (quantity > 0),
     PRIMARY KEY (order_id, menu_item_id),
-    FOREIGN KEY (order_id) REFERENCES `Order`(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (order_id) REFERENCES Order(order_id) ON DELETE CASCADE,
     FOREIGN KEY (menu_item_id) REFERENCES MenuItem(menu_item_id) ON DELETE CASCADE
 );
 
@@ -99,16 +98,15 @@ CREATE TABLE Rating (
     order_id INT NOT NULL,
     rating_value INT NOT NULL CHECK (rating_value BETWEEN 1 AND 5),
     review_text TEXT,
-    PRIMARY KEY (customer_id, order_id),
-    FOREIGN KEY (customer_id) REFERENCES User(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (order_id) REFERENCES `Order`(order_id) ON DELETE CASCADE
+    PRIMARY KEY (order_id),
+    FOREIGN KEY (order_id) REFERENCES Order(order_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Card (
     customer_id INT,
-    card_no INT(16) PRIMARY KEY,
+    card_no VARCHAR(16) PRIMARY KEY,
     card_holder_name VARCHAR(100) NOT NULL,
     expiry_date DATE NOT NULL,
-    cvv INT(3) NOT NULL,
+    cvv VARCHAR(3) NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES User(user_id) ON DELETE CASCADE
 );

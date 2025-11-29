@@ -1,10 +1,9 @@
 package FOS_CORE;
 
+import FOS_DATA.IUserData;
 import FOS_DATA.UserData;
-import FOS_DATA.UserDataAccess;
 
 import java.util.ArrayList;
-import FOS_DATA.UserDataAccess.*;
 
 public class Customer extends User {
 
@@ -12,7 +11,7 @@ public class Customer extends User {
     private ArrayList<Address> addresses;
     private ArrayList<Order> orders;
     private ArrayList<Card> cards;
-    private final UserData userData = new UserDataAccess();
+    private final IUserData userData = new UserData();
     private ArrayList<CartItem> cart;
 
     public Customer() { }
@@ -45,7 +44,7 @@ public class Customer extends User {
         return cards;
     }
 
-    public UserData getUserData() {
+    public IUserData getUserData() {
         return userData;
     }
 
