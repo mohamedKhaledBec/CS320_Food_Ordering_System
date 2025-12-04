@@ -1,28 +1,37 @@
 package FOS_CORE;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class RestaurantService implements IRestaurantService {
 
     @Override
-    public List<Restaurant> getRestaurants(String city) {
+    public ArrayList<Restaurant> getRestaurantsByCity(String city) {
         // TODO: Implementation
         return null;
     }
 
     @Override
-    public Menu getMenu(String restaurantID) {
+    public ArrayList<MenuItem> getMenu(Restaurant restaurant) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public ArrayList<MenuItem> getRestaurantMenu(Restaurant restaurant) {
         // TODO: Implementation
         return null;
     }
 
     @Override
-    public List<Restaurant> searchRestaurants(String keyword) {
+    public ArrayList<Restaurant> searchRestaurantsByKeyword(String keyword) {
         // TODO: Implementation
         return null;
     }
 
-    private void loadRestaurantData(String restaurantID) {
+    public ArrayList<String> fetchKeywords(Restaurant restaurant){
+
+    }
+
+    private void loadRestaurantData(Restaurant restaurant) {
         // TODO: Implementation
     }
 }

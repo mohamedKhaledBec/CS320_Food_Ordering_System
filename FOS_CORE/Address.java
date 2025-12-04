@@ -17,6 +17,7 @@ public class Address {
         this.zipCode = zipCode;
     }
 
+
     public int getAddressID() {
         return addressID;
     }
@@ -55,5 +56,8 @@ public class Address {
 
     public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
+    }
+    public String toString() {
+        return addressLine + ", " + city + ", " + state + " " + zipCode;
     }
 }

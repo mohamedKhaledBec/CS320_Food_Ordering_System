@@ -21,8 +21,12 @@ public class Customer extends User {
         AccountService accountService = new AccountService();
         this.phoneNumbers = accountService.fetchCustomerPhoneNumbers(this);
         this.addresses = accountService.fetchCustomerAddresses(this);
-        this.orders = accountService.fetchCustomerOrders(this, FOS.getAllRestaurants());
+        this.orders = accountService.fetchCustomerOrders(this);
         this.cards = accountService.fetchCustomerCards(this);
+    }
+
+    public Customer(String email, String password) {
+
     }
 
     public ArrayList<String> getPhoneNumbers() {

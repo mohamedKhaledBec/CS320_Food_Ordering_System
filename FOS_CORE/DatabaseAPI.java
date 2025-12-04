@@ -5,56 +5,56 @@ import java.util.ArrayList;
 
 public class DatabaseAPI {
 
-    private final IUserData dao;
+    private final IUserData DB;
 
 
     public DatabaseAPI() {
-        this.dao = new FOS_DATA.UserData();
+        this.DB = new FOS_DATA.UserData();
     }
 
     public boolean addNewCustomer(User user) {
 
-        return dao.addNewCustomer(user);
+        return DB.addNewCustomer(user);
     }
 
     public User getUserByEmail(String email) {
-        return dao.getUserByEmail(email);
+        return DB.getUserByEmail(email);
     }
 
     public boolean changeUserPassword(User user, String newHashedPassword) {
-        return dao.changeUserPassword(user, newHashedPassword);
+        return DB.changeUserPassword(user, newHashedPassword);
     }
 
     public ArrayList<Card> fetchCustomerCards(Customer customer) {
-        return dao.fetchCustomerCards(customer);
+        return DB.fetchCustomerCards(customer);
     }
 
-    public boolean addCardToCustomer(Customer customer, Card card) {
-        return dao.addCardToCustomer(customer, card);
+    public void addCardToCustomer(Customer customer, Card card) {
+        DB.addCardToCustomer(customer, card);
     }
 
     public ArrayList<Address> fetchCustomerAddresses(Customer customer) {
-        return dao.fetchCustomerAddresses(customer);
+        return DB.fetchCustomerAddresses(customer);
     }
 
-    public boolean addAddress(Customer customer, Address address) {
-        return dao.addAddress(customer, address);
+    public void addAddress(Customer customer, Address address) {
+        DB.addAddressToCustomer(customer, address);
     }
 
     public ArrayList<String> fetchCustomerPhoneNumbers(Customer customer) {
-        return dao.fetchCustomerPhoneNumbers(customer);
+        return DB.fetchCustomerPhoneNumbers(customer);
     }
 
-    public boolean addPhoneNumber(Customer customer, String phoneNumber) {
-        return dao.addPhoneNumber(customer, phoneNumber);
+    public void addPhoneNumber(Customer customer, String phoneNumber) {
+        DB.addPhoneNumberToCustomer(customer, phoneNumber);
     }
 
     public ArrayList<Order> fetchCustomerOrders(Customer customer, ArrayList<Restaurant> restaurants) {
-        return dao.fetchCustomerOrders(customer, restaurants);
+        return DB.fetchCustomerOrders(customer);
     }
 
     public boolean insertCustomerOrder(Customer customer, Order order, Restaurant restaurant) {
-        return dao.insertCustomerOrder(customer, order, restaurant);
+        return DB.insertCustomerOrder(customer, order, restaurant);
     }
 
 }

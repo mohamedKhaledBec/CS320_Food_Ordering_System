@@ -8,9 +8,9 @@ public class Restaurant {
 
     private int restaurantID;
     private String restaurantName;
-    private Manager managerID;
     private String cuisineType;
     private String city;
+    ArrayList<String> Keywords;
     private ArrayList<MenuItem> menu;
 
     public Restaurant(){ }
@@ -46,14 +46,6 @@ public class Restaurant {
         this.restaurantName = restaurantName;
     }
 
-    public Manager getManagerID() {
-        return managerID;
-    }
-
-    public void setManagerID(Manager managerID) {
-        this.managerID = managerID;
-    }
-
     public String getCuisineType() {
         return cuisineType;
     }
@@ -69,4 +61,8 @@ public class Restaurant {
     public void setCity(String city) {
         this.city = city;
     }
+
+    public ArrayList<String> getKeywords() {return Keywords;}
+
+    public void setKeywords(ArrayList<String> keywords) {Keywords = keywords;}
 }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class UserData implements IUserData {
     public boolean addNewCustomer(User user){
-        final String sql = "INSERT INTO User (username, password, user_type) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO User (username, password, user_type) VALUES (?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, user.getEmail());
@@ -14,6 +14,16 @@ public class UserData implements IUserData {
             statement.setString(3, "customer");
             int rowsAffected = statement.executeUpdate();
             if (rowsAffected > 0) {
+                sql = "SELECT user_id FROM User WHERE username = ?";
+                try (PreparedStatement idStatement = connection.prepareStatement(sql)) {
+                    idStatement.setString(1, user.getEmail());
+                    try (ResultSet resultSet = idStatement.executeQuery()) {
+                        if (resultSet.next()) {
+                            int userId = resultSet.getInt("user_id");
+                            user.setUserID(userId);
+                        }
+                    }
+                }
                 return true;
             }
         } catch (SQLException e) {
@@ -225,10 +235,10 @@ public class UserData implements IUserData {
             return false;
         }
     }
-    public ArrayList<Order> fetchCustomerOrders(Customer customer, ArrayList<Restaurant> restaurants) {
+    public ArrayList<Order> fetchCustomerOrders(Customer customer) {
         int customerId = customer.getUserID();
         ArrayList<Order> orders = new ArrayList<>();
-        String sql = "SELECT o.order_id, o.order_date, o.status, r.restaurant_id as restaurant_id, \n" +
+        String sql = "SELECT o.order_id, o.order_date, o.status, r.restaurant_name, \n" +
                 "                       a.address_id,\n" +
                 "                       rt.rating, rt.comment\n" +
                 "                FROM Order o\n" +
@@ -246,49 +256,19 @@ public class UserData implements IUserData {
                     int order_id = resultSet.getInt("order_id");
                     Date date = resultSet.getDate("order_date");
                     OrderStatus status = OrderStatus.valueOf(resultSet.getString("status"));
-                    int restaurantId = resultSet.getInt("restaurant_id");
                     Rating rating = new Rating(resultSet.getObject("rating") != null ? resultSet.getInt("rating") : null, resultSet.getString("comment"));
                     int addressId = resultSet.getInt("address_id");
-                    Address deliveryAddress = new Address();
-                    for (Address address : customer.getAddresses()) {
-                        if (address.getAddressID() == addressId) {
-                            deliveryAddress = address;
-                            break;
-                        }
-                    }
-                    String restaurantName = "";
-                    ArrayList<CartItem> items = new ArrayList<>();
-                    sql = "SELECT mi.menu_item_id, oi.quantity" +
-                            "FROM OrderItem oi " +
-                            "JOIN MenuItem mi ON oi.menu_item_id = mi.menu_item_id " +
-                            "WHERE oi.order_id = ?";
-                    try (PreparedStatement itemStatement = connection.prepareStatement(sql)) {
-                        itemStatement.setInt(1, order_id);
-                        try (ResultSet itemResultSet = itemStatement.executeQuery()) {
-                            int menuItemId = itemResultSet.getInt("menu_item_id");
-                            for (Restaurant restaurant : restaurants) {
-                                if (restaurant.getRestaurantID() == restaurantId) {
-                                    restaurantName = restaurant.getRestaurantName();
-                                    for (MenuItem menuItem : restaurant.getMenu()) {
-                                        if (menuItem.getMenuItemID() == menuItemId) {
-                                            int quantity = itemResultSet.getInt("quantity");
-                                            items.add(new CartItem(menuItem, quantity));
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        orders.add(new Order(deliveryAddress, items, date, status, restaurantName, order_id, rating));
-                    }
+                    String addressDetails = fetchAddressDetails(addressId);
+                    String restaurantName = resultSet.getString("restaurant_name");
+                    ArrayList<CartItem> items = fetchOrderItemsByOrderID(order_id);
+                    Order order = new Order(addressDetails, items, date, status, restaurantName, order_id, rating);
+                    orders.add(order);
                 }
-            } catch (SQLException e) {
-                System.out.println("Database failed to fetch customer orders");
             }
-            return orders;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println("Database failed to fetch customer orders");
         }
+        return orders;
     }
     public boolean insertCustomerOrder(Customer customer, Order order, Restaurant restaurant) {
         int customerId = customer.getUserID();
@@ -318,4 +298,91 @@ public class UserData implements IUserData {
         return false;
     }
 
+
+    public ArrayList<Restaurant> getManagerRestaurants(Manager manager) {
+        int managerId = manager.getUserID();
+        ArrayList<Restaurant> restaurants = new ArrayList<>();
+        String sql = "SELECT restaurant_id, name, cuisine_type, city FROM Restaurant WHERE manager_id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, managerId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    int restaurantId = resultSet.getInt("restaurant_id");
+                    String name = resultSet.getString("name");
+                    String cuisineType = resultSet.getString("cuisine_type");
+                    String city = resultSet.getString("city");
+                    restaurants.add(new Restaurant(restaurantId, name, cuisineType, city));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Database failed to fetch manager restaurants");
+        }
+        return restaurants;
+    }
+
+
+    //private functions start here
+    private ArrayList<Restaurant> fetchRestaurants() {;
+        ArrayList<Restaurant> restaurants = new ArrayList<>();
+        final String sql = "SELECT restaurant_id, name, cuisine_type, city FROM Restaurant";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                int restaurantId = resultSet.getInt("restaurant_id");
+                String name = resultSet.getString("name");
+                String cuisineType = resultSet.getString("cuisine_type");
+                String city = resultSet.getString("city");
+                restaurants.add(new Restaurant(restaurantId, name, cuisineType, city));
+            }
+        } catch (SQLException e) {
+            System.out.println("Database failed to fetch restaurants");
+        }
+        return restaurants;
+    }
+    private String fetchAddressDetails(int addressId){
+        final String sql = "SELECT street, city, state, zip_code, country FROM Address WHERE address_id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, addressId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                String street = resultSet.getString("street");
+                String city = resultSet.getString("city");
+                String state = resultSet.getString("state");
+                String zipCode = resultSet.getString("zip_code");
+                String country = resultSet.getString("country");
+                return street + ", " + city + ", " + state + " " + zipCode + ", " + country;
+            }
+        }catch (SQLException e) {
+            System.out.println("Database failed to fetch address details: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private ArrayList<CartItem> fetchOrderItemsByOrderID(int orderID) {
+        ArrayList<CartItem> items = new ArrayList<>();
+        final String sql = "SELECT mi.menu_item_id, mi.item_name, mi.description, mi.price, oi.quantity " +
+                "FROM OrderItem oi " +
+                "JOIN MenuItem mi ON oi.menu_item_id = mi.menu_item_id " +
+                "WHERE oi.order_id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, orderID);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int menuItemId = resultSet.getInt("menu_item_id");
+                String itemName = resultSet.getString("item_name");
+                String description = resultSet.getString("description");
+                double price = resultSet.getDouble("price");
+                int quantity = resultSet.getInt("quantity");
+                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price);
+                items.add(new CartItem(menuItem, quantity));
+            }
+        } catch (SQLException e) {
+            System.out.println("Database failed to fetch order items: " + e.getMessage());
+        }
+        return items;
+    }
 }

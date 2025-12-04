@@ -8,21 +8,19 @@ public class Order {
     private OrderStatus status;
     private Date creationDate;
     private Rating rating;
-    private Address deliveryAddress;
+    private String deliveryAddress;
     private ArrayList<CartItem> items;
     private String restaurantName;
 
 
-    public Order() { } // this will be used for the DAO
-
-    public Order(Address deliveryAddress, ArrayList<CartItem> items, String restaurantName) {
+    public Order(String deliveryAddress, ArrayList<CartItem> items, String restaurantName) {
         this.deliveryAddress = deliveryAddress;
         this.creationDate = new Date(System.currentTimeMillis());
         this.items = items;
         this.status = OrderStatus.PENDING;
         this.restaurantName = restaurantName;
     }
-    public Order(Address deliveryAddress, ArrayList<CartItem> items, Date date, OrderStatus status, String restaurantName, int orderID, Rating rating) {
+    public Order(String deliveryAddress, ArrayList<CartItem> items, Date date, OrderStatus status, String restaurantName, int orderID, Rating rating) {
         this.deliveryAddress = deliveryAddress;
         this.creationDate = date;
         this.items = items;

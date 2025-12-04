@@ -1,9 +1,10 @@
 package FOS_CORE;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public interface IRestaurantService {
-    List<Restaurant> getRestaurants(String city);
-    List<MenuItem> getMenu(int restaurantID);
-    List<Restaurant> searchRestaurants(String keyword);
+    public ArrayList<Restaurant> getRestaurantsByCity(String city) ;
+    public ArrayList<MenuItem> getMenu(Restaurant restaurant);
+    public ArrayList<MenuItem> getRestaurantMenu(Restaurant restaurant);
+    public ArrayList<Restaurant> searchRestaurantsByKeyword(String keyword);
 }
