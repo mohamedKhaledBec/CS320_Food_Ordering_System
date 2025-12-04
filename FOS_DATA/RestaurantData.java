@@ -94,7 +94,7 @@ public class RestaurantData implements IRestaurantData {
 
     public ArrayList<MenuItem> fetchRestaurantMenu(Restaurant restaurant) {
         int restaurantId = restaurant.getRestaurantID();
-        ArrayList<MenuItem> menu = new ArrayList();
+        ArrayList<MenuItem> menu = new ArrayList<>();
         final String sql = "SELECT menu_item_id, item_name, description, price FROM MenuItem WHERE restaurant_id = ?";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -105,7 +105,7 @@ public class RestaurantData implements IRestaurantData {
                 String itemName = resultSet.getString("item_name");
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
-                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price);
+                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price, fetchDiscountsByMenuItemID(menuItemId));
                 menu.add(menuItem);
             }
             return menu;
@@ -208,7 +208,7 @@ public class RestaurantData implements IRestaurantData {
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
                 int quantity = resultSet.getInt("quantity");
-                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price);
+                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price, fetchDiscountsByMenuItemID(menuItemId));
                 items.add(new CartItem(menuItem, quantity));
             }
         } catch (SQLException e) {
@@ -216,5 +216,28 @@ public class RestaurantData implements IRestaurantData {
         }
         return items;
     }
+
+    private ArrayList<Discount> fetchDiscountsByMenuItemID(int menuItemID) {
+        ArrayList<Discount> discounts = new ArrayList<>();
+        final String sql = "SELECT discount_id, discount_name, discount_description, discount_percentage, start_date, end_date FROM Discount WHERE menu_item_id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, menuItemID);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int discountId = resultSet.getInt("discount_id");
+                String discountName = resultSet.getString("discount_name");
+                String discountDescription = resultSet.getString("discount_description");
+                double percentage = resultSet.getDouble("percentage");
+                Date startDate = resultSet.getDate("start_date");
+                Date endDate = resultSet.getDate("end_date");
+                discounts.add(new Discount(discountId,discountName, discountDescription, percentage, startDate, endDate));
+            }
+        } catch (SQLException e) {
+            System.out.println("Database failed to fetch discounts: " + e.getMessage());
+        }
+        return discounts;
+    }
+
 }
 

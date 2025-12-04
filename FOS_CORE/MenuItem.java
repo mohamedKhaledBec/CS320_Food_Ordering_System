@@ -1,6 +1,7 @@
 package FOS_CORE;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public class MenuItem {
 
@@ -8,14 +9,16 @@ public class MenuItem {
     private String itemName;
     private String description;
     private double price;
+    private ArrayList<Discount> discounts;
 
     public MenuItem(){ }
 
-    public MenuItem(int menuItemID, String itemName, String description, double price){
+    public MenuItem(int menuItemID, String itemName, String description, double price, ArrayList<Discount> discounts){
         this.menuItemID = menuItemID;
         this.itemName = itemName;
         this.description = description;
         this.price = price;
+        this.discounts = discounts;
     }
 
     public int getMenuItemID() {
@@ -48,5 +51,13 @@ public class MenuItem {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public ArrayList<Discount> getDiscounts() {
+        return discounts;
+    }
+
+    public void setDiscounts(ArrayList<Discount> discounts) {
+        this.discounts = discounts;
     }
 }
