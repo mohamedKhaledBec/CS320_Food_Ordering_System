@@ -125,7 +125,7 @@ public class ManagerService extends UserData implements IManagerService {
                 String itemName = resultSet.getString("item_name");
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
-                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price, fetchDiscountsByMenuItemID(menuItemId));
+                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price);
                 menu.add(menuItem);
             }
             return menu;
@@ -254,7 +254,7 @@ public class ManagerService extends UserData implements IManagerService {
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
                 int quantity = resultSet.getInt("quantity");
-                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price, fetchDiscountsByMenuItemID(menuItemId));
+                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price);
                 items.add(new CartItem(menuItem, quantity));
             }
         } catch (SQLException e) {
@@ -263,24 +263,26 @@ public class ManagerService extends UserData implements IManagerService {
         return items;
     }
 
-    private ArrayList<Discount> fetchDiscountsByMenuItemID(int menuItemID) {
+    private ArrayList<Discount> fetchMenuItemDiscounts(MenuItem menuItem) {
         ArrayList<Discount> discounts = new ArrayList<>();
-        final String sql = "SELECT discount_id, discount_name, discount_description, discount_percentage, start_date, end_date FROM Discount WHERE menu_item_id = ?";
+        final String sql = "SELECT * FROM Discount WHERE MenuItemID = ?";
         try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, menuItemID);
-            ResultSet resultSet = statement.executeQuery();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                int discountId = resultSet.getInt("discount_id");
+                int discountID = resultSet.getInt("discount_id");
                 String discountName = resultSet.getString("discount_name");
                 String discountDescription = resultSet.getString("discount_description");
-                double percentage = resultSet.getDouble("percentage");
+                double percentage = resultSet.getDouble("discount_percentage");
                 Date startDate = resultSet.getDate("start_date");
                 Date endDate = resultSet.getDate("end_date");
-                discounts.add(new Discount(discountId,discountName, discountDescription, percentage, startDate, endDate));
-            }
+                long millis= System.currentTimeMillis();
+                Date currentDate = new Date(millis);
+                Discount discount = new Discount(discountID, discountName, discountDescription, percentage, startDate, endDate);
+                discounts.add(discount);
+                }
         } catch (SQLException e) {
-            System.out.println("Database failed to fetch discounts: " + e.getMessage());
+            System.out.println("Database failed to fetch Menu Item Discounts: " + e.getMessage());
         }
         return discounts;
     }

@@ -70,8 +70,8 @@ INSERT INTO MenuItem (restaurant_id, item_name, description, price) VALUES
 -- DISCOUNTS (rewritten based on real DDL)
 INSERT INTO Discount (menu_item_id, discount_name, discount_description, discount_percentage, start_date, end_date)
 VALUES
-(1, 'Pizza Deal', '10% off pizzas', 10.00, '2025-04-01 00:00:00', '2025-04-30 23:59:59'),
-(4, 'Sushi Special', '15% off rolls', 15.00, '2025-04-01 00:00:00', '2025-04-30 23:59:59');
+(1, 'Pizza Deal', '10% off pizzas', 10.00, '2025-04-01 00:00:00', '2025-12-30 23:59:59'),
+(4, 'Sushi Special', '15% off rolls', 15.00, '2025-04-01 00:00:00', '2025-12-30 23:59:59');
 
 -- ORDERS
 INSERT INTO `Order` (customer_id, restaurant_id, order_status, order_date, delivery_address_id) VALUES

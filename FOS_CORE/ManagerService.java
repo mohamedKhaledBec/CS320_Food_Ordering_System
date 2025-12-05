@@ -112,8 +112,8 @@ public class ManagerService implements IManagerService {
         // Ensure no overlapping discounts for this menu item
         for (Discount existing : item.getDiscounts()) {
             if (existing == null) continue;
-            java.sql.Date exStart = existing.getStartDate();
-            java.sql.Date exEnd = existing.getEndDate();
+            Date exStart = existing.getStartDate();
+            Date exEnd = existing.getEndDate();
             if (exStart == null || exEnd == null) continue;
             // overlap if newStart <= exEnd && newEnd >= exStart
             if (!endDate.before(exStart) && !startDate.after(exEnd)) {
@@ -135,20 +135,6 @@ public class ManagerService implements IManagerService {
         if (item.getPrice() < 0) {
             throw new IllegalArgumentException("Menu item price cannot be negative");
         }
-    }
-
-    private double calculateDiscount(MenuItem item) {
-        if (item == null || item.getDiscounts() == null) return 0.0;
-        java.sql.Date now = new java.sql.Date(new java.util.Date().getTime());
-        for (Discount d : item.getDiscounts()) {
-            if (d == null) continue;
-            java.sql.Date start = d.getStartDate();
-            java.sql.Date end = d.getEndDate();
-            if (start != null && end != null && !now.before(start) && !now.after(end)) {
-                return d.getDiscountPercentage();
-            }
-        }
-        return 0.0;
     }
 
     private void saveRestaurantChanges(Restaurant restaurant) {

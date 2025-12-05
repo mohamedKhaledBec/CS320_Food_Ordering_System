@@ -5,6 +5,7 @@ import FOS_CORE.MenuItem;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RestaurantMenuPanel extends JPanel {
@@ -12,6 +13,7 @@ public class RestaurantMenuPanel extends JPanel {
     private Restaurant currentRestaurant;
     private JPanel menuPanel;
     private JLabel restaurantNameLabel;
+    RestaurantService service = new RestaurantService();
 
     public RestaurantMenuPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -50,9 +52,8 @@ public class RestaurantMenuPanel extends JPanel {
             return;
         }
 
-        List<MenuItem> menuItems = currentRestaurant.getMenu();
+        ArrayList<MenuItem> menuItems = currentRestaurant.getMenu();
         if (menuItems == null || menuItems.isEmpty()) {
-            RestaurantService service = mainFrame.getRestaurantService();
             menuItems = service.fetchRestaurantMenu(currentRestaurant);
             if (menuItems != null) {
                 currentRestaurant.setMenu(new java.util.ArrayList<>(menuItems));
@@ -81,12 +82,19 @@ public class RestaurantMenuPanel extends JPanel {
         JLabel nameLabel = new JLabel(item.getItemName());
         nameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
         JLabel descLabel = new JLabel(item.getDescription() != null ? item.getDescription() : "");
-        JLabel priceLabel = new JLabel(String.format("$%.2f", item.getPrice()));
+        JLabel priceLabel = new JLabel(String.format("  $%.2f", item.getPrice()));
+        double discountedPrice = service.calculateMenuItemDiscount(item);
+        JLabel discountedPriceLabel = new JLabel();
+        if (discountedPrice > 0) {
+            priceLabel.setText(String.format("Original Price:   " + String.format("$%.2f", item.getPrice())));
+            discountedPriceLabel.setText(String.format("Discounted Price:   "+ String.format("$%.2f", discountedPrice)));
+        }
 
         JPanel infoPanel = new JPanel(new GridLayout(3, 1));
         infoPanel.add(nameLabel);
         infoPanel.add(descLabel);
         infoPanel.add(priceLabel);
+        infoPanel.add(discountedPriceLabel);
 
         JPanel quantityPanel = new JPanel(new FlowLayout());
         quantityPanel.add(new JLabel("Quantity:"));

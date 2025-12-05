@@ -327,7 +327,7 @@ public class CustomerService extends UserData implements ICustomerService {
                 double price = resultSet.getDouble("price");
                 int quantity = resultSet.getInt("quantity");
                 ArrayList<Discount> discounts = fetchDiscountsByMenuItemID(menuItemId);
-                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price, discounts);
+                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price);
                 items.add(new CartItem(menuItem, quantity));
             }
         } catch (SQLException e) {

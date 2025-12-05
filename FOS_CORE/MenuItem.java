@@ -1,5 +1,7 @@
 package FOS_CORE;
 
+import FOS_DATA.IRestaurantData;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -13,12 +15,13 @@ public class MenuItem {
 
     public MenuItem(){ }
 
-    public MenuItem(int menuItemID, String itemName, String description, double price, ArrayList<Discount> discounts){
+    public MenuItem(int menuItemID, String itemName, String description, double price){
+        RestaurantService restaurantService = new RestaurantService();
         this.menuItemID = menuItemID;
         this.itemName = itemName;
         this.description = description;
         this.price = price;
-        this.discounts = discounts;
+        this.discounts = restaurantService.fetchMenuItemDiscounts(this);
     }
 
     public int getMenuItemID() {
