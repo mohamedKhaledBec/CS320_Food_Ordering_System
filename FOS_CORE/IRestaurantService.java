@@ -6,5 +6,5 @@ public interface IRestaurantService {
     public ArrayList<Restaurant> getRestaurantsByCity(String city) ;
     public ArrayList<MenuItem> fetchRestaurantMenu(Restaurant restaurant);
     public ArrayList<String> fetchRestaurantKeywords(Restaurant restaurant);
-    public ArrayList<Restaurant> searchRestaurantsByKeyword(String keyword);
+    public ArrayList<Restaurant> searchRestaurantsByKeyword(String keyword, ArrayList<Restaurant> inRestaurants);
 }

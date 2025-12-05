@@ -22,9 +22,19 @@ public class RestaurantService implements IRestaurantService {
     }
 
     @Override
-    public ArrayList<Restaurant> searchRestaurantsByKeyword(String keyword) {
-        // TODO: Implementation
-        return null;
+    public ArrayList<Restaurant> searchRestaurantsByKeyword(String keyword, ArrayList<Restaurant> inRestaurants) {
+        if (keyword == null || keyword.isEmpty()) {
+            return new ArrayList<>();
+        }
+        ArrayList<Restaurant> results = new ArrayList<>();
+            for (Restaurant r : inRestaurants) {
+                if (r.getRestaurantName().toLowerCase().contains(keyword.toLowerCase()) ||
+                        r.getCuisineType().toLowerCase().contains(keyword.toLowerCase())||
+                        r.getKeywords().contains(keyword.toLowerCase())) {
+                    results.add(r);
+                }
+        }
+        return results;
     }
 
     public ArrayList<String> fetchRestaurantKeywords(Restaurant restaurant){

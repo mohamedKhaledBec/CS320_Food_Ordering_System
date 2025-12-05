@@ -12,7 +12,7 @@ public class RestaurantListPanel extends JPanel {
     private JPanel restaurantPanel;
     private JComboBox<String> cityDropdown;
     private JTextField searchField;
-    ArrayList<String> customerCities;
+    ArrayList<Restaurant> restaurants;
 
     public RestaurantListPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -70,7 +70,7 @@ public class RestaurantListPanel extends JPanel {
     private void searchByKeyword() {
         String keyword = searchField.getText().trim();
         if (keyword.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter a search keyword.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            searchByCity();
             return;
         }
         loadRestaurantsByKeyword(keyword);
@@ -79,7 +79,7 @@ public class RestaurantListPanel extends JPanel {
     private void loadRestaurantsByCity(String city) {
         restaurantPanel.removeAll();
         RestaurantService service = mainFrame.getRestaurantService();
-        List<Restaurant> restaurants = service.getRestaurantsByCity(city);
+        this.restaurants = service.getRestaurantsByCity(city);
 
         if (restaurants.isEmpty()) {
             restaurantPanel.add(new JLabel("No restaurants found in " + city));
@@ -96,7 +96,7 @@ public class RestaurantListPanel extends JPanel {
     private void loadRestaurantsByKeyword(String keyword) {
         restaurantPanel.removeAll();
         RestaurantService service = mainFrame.getRestaurantService();
-        List<Restaurant> restaurants = service.searchRestaurantsByKeyword(keyword);
+        this.restaurants = service.searchRestaurantsByKeyword(keyword,restaurants);
 
         if (restaurants.isEmpty()) {
             restaurantPanel.add(new JLabel("No restaurants found matching: " + keyword));
