@@ -1,9 +1,6 @@
 package FOS_UI;
 
-import FOS_CORE.Customer;
-import FOS_CORE.Manager;
-import FOS_CORE.User;
-import FOS_CORE.ILoginService;
+import FOS_CORE.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -105,8 +102,8 @@ public class LoginWindow extends JFrame {
             DialogUtils.showError(this, "Please enter a valid email address.");
             return;
         }
-        ILoginService loginService = ServiceContext.getLoginService();
-        User user = loginService.login(email, password);
+        IAccountService accountService = ServiceContext.getAccountService();
+        User user = accountService.login(email, password);
 
         if (user == null) {
             DialogUtils.showError(this, "Invalid email or password.");

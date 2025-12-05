@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class OrderService implements IOrderService {
 
     @Override
-    public Order placeOrder(Customer customer, ArrayList<MenuItem> cart, Address address) {
+    public Order placeOrder(Customer customer, ArrayList<CartItem> cart, Address address) {
         // TODO: Implementation
         return null;
     }

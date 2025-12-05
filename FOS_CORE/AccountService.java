@@ -5,6 +5,7 @@ import java.util.List;
 import FOS_DATA.*;
 
 public class AccountService implements IAccountService {
+    private final IUserData userData = new UserData() ;
 
     private final ICustomerService DB = new CustomerService() ;
     // Working on it : Mohamed Khaled Becetti
@@ -77,6 +78,35 @@ public class AccountService implements IAccountService {
     }
     public ArrayList<Address> fetchCustomerAddresses(Customer customer){
         return DB.fetchCustomerAddresses(customer);
+    }
+
+    @Override
+    public User login(String email, String password) {
+        if (!validateCredentials(email, password)) {
+            return null;
+        }
+        User user = getUserByEmail(email);
+        if (user == null || !verifyPassword(user, password)) {
+            return null;
+        }
+        return user;
+    }
+
+    @Override
+    public void logout() {
+        // TODO: Implementation
+    }
+
+    private boolean validateCredentials(String email, String password) {
+        return email != null && !email.isEmpty() && validateEmailFormat(email)
+                && password != null && !password.isEmpty();
+    }
+
+    private User getUserByEmail(String email) {
+        return userData.getUserByEmail(email);
+    }
+    private boolean verifyPassword(User user, String password) {
+        return PasswordUtils.verifyPassword(password, user.getPasswordHash());
     }
     //Working on it : Mohamed Khaled Becetti
     private boolean validateEmailFormat(String email) {

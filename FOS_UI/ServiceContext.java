@@ -10,7 +10,6 @@ import FOS_CORE.IRestaurantService;
 
 import FOS_CORE.AccountService;
 import FOS_CORE.CartService;
-import FOS_CORE.LoginService;
 import FOS_CORE.ManagerService;
 import FOS_CORE.OrderService;
 import FOS_CORE.PaymentService;
@@ -18,7 +17,6 @@ import FOS_CORE.RestaurantService;
 
 public final class ServiceContext {
 
-    private static final ILoginService loginService = new LoginService();
     private static final IAccountService accountService = new AccountService();
     private static final IRestaurantService restaurantService = new RestaurantService();
     private static final ICartService cartService = new CartService();
@@ -27,10 +25,6 @@ public final class ServiceContext {
     private static final IPaymentService paymentService = new PaymentService();
 
     private ServiceContext() {}
-
-    public static ILoginService getLoginService() {
-        return loginService;
-    }
 
     public static IAccountService getAccountService() {
         return accountService;

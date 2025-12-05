@@ -11,11 +11,6 @@ public class RestaurantService implements IRestaurantService {
     }
 
     @Override
-    public ArrayList<MenuItem> getMenu(Restaurant restaurant) {
-        return new ArrayList<>();
-    }
-
-    @Override
     public ArrayList<MenuItem> fetchRestaurantMenu(Restaurant restaurant) {
         // TODO: Implementation
         return null;

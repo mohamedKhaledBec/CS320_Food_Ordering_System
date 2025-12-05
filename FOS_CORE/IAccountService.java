@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 
 public interface IAccountService {
+    public User login(String email, String password);
+    public void logout();
     boolean createCustomerAccount(String email, String phone, String password);
     void changePassword(User user, String newPassword);
     void updateContactInfo(Customer customer, String phone);

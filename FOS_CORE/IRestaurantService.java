@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public interface IRestaurantService {
     public ArrayList<Restaurant> getRestaurantsByCity(String city) ;
-    public ArrayList<MenuItem> getMenu(Restaurant restaurant);
     public ArrayList<MenuItem> fetchRestaurantMenu(Restaurant restaurant);
     public ArrayList<String> fetchRestaurantKeywords(Restaurant restaurant);
     public ArrayList<Restaurant> searchRestaurantsByKeyword(String keyword);
