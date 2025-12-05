@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import FOS_CORE.*;
 import FOS_CORE.MenuItem;
 
-public interface IManagerData extends IUserData {
+public interface IManagerService {
 
     public boolean saveRestaurantInfo(Restaurant restaurant);
     public ArrayList<Restaurant> fetchRestaurantsByCity(String city);

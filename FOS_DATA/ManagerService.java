@@ -4,7 +4,7 @@ import FOS_CORE.*;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class ManagerData extends UserData implements IManagerData {
+public class ManagerService extends UserData implements IManagerService {
     public boolean saveRestaurantInfo(Restaurant restaurant) {
         String sql = "INSERT INTO Restaurant (manager_id, name, cuisine_type, city) VALUES (?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();

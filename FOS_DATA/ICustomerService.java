@@ -10,7 +10,7 @@ import FOS_CORE.*;
 
 import java.util.ArrayList;
 
-public interface ICustomerData extends IUserData {
+public interface ICustomerService extends IUserData {
     public boolean addNewCustomer(User user);
     public ArrayList<Card> fetchCustomerCards(Customer customer);
     public boolean addCardToCustomer(Customer customer, Card card);

@@ -4,7 +4,7 @@ import FOS_CORE.*;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class CustomerData extends UserData implements ICustomerData {
+public class CustomerService extends UserData implements ICustomerService {
     public boolean addNewCustomer(User user){
         String sql = "INSERT INTO User (username, password, user_type) VALUES (?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();

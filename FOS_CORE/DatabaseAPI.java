@@ -1,16 +1,16 @@
 package FOS_CORE;
 
-import FOS_DATA.CustomerData;
-import FOS_DATA.ICustomerData;
+import FOS_DATA.CustomerService;
+import FOS_DATA.ICustomerService;
 import java.util.ArrayList;
 
 public class DatabaseAPI {
 
-    private final ICustomerData DB;
+    private final ICustomerService DB;
 
 
     public DatabaseAPI() {
-        this.DB = new CustomerData();
+        this.DB = new CustomerService();
     }
 
     public boolean addNewCustomer(User user) {

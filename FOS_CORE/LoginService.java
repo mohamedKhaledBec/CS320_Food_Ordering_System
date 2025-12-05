@@ -1,10 +1,10 @@
 package FOS_CORE;
 
-import FOS_DATA.ICustomerData;
-import FOS_DATA.CustomerData;
+import FOS_DATA.ICustomerService;
+import FOS_DATA.CustomerService;
 
 public class LoginService implements ILoginService {
-    private final ICustomerData userData = new CustomerData();
+    private final ICustomerService userData = new CustomerService();
     @Override
     public User login(String email, String password) {
         if (!validateCredentials(email, password)) {

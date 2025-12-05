@@ -1,6 +1,7 @@
-package FOS_UI;
+package FOS_UI.MockUI;
 
 import FOS_CORE.*;
+
 import javax.swing.*;
 import java.awt.*;
 
