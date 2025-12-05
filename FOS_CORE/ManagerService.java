@@ -14,37 +14,32 @@ public class ManagerService implements IManagerService {
     }
 
     @Override
-    public void updateRestaurantInfo(Manager manager, Restaurant details) {
-        if (manager == null || details == null) {
-            throw new IllegalArgumentException("Manager and restaurant details must not be null");
+    public void updateRestaurantInfo(Restaurant restaurant) {
+        if (restaurant == null) {
+            throw new IllegalArgumentException("Restaurant details must not be null");
         }
-        if (details.getRestaurantName() == null || details.getRestaurantName().trim().isEmpty()) {
+        if (restaurant.getRestaurantName() == null || restaurant.getRestaurantName().trim().isEmpty()) {
             throw new IllegalArgumentException("Restaurant name is required");
         }
-        details.setRestaurantID(manager.getUserID());
-        boolean ok = DB.saveRestaurantInfo(details);
+        boolean ok = DB.saveRestaurantInfo(restaurant);
         if (!ok) throw new RuntimeException("Failed to save restaurant info");
-        saveRestaurantChanges(manager, details);
+        saveRestaurantChanges(restaurant);
     }
 
     @Override
-    public void addMenuItem(Manager manager, MenuItem item) {
-        if (manager == null || item == null) {
-            throw new IllegalArgumentException("Manager and menu item must not be null");
+    public void addMenuItem(Restaurant restaurant, MenuItem item) {
+        if (restaurant == null || item == null) {
+            throw new IllegalArgumentException("Restaurant and menu item must not be null");
         }
         validateMenuItem(item);
-        Restaurant restaurant = getRestaurantDetails(manager);
-        if (restaurant == null) {
-            throw new IllegalStateException("Manager has no associated restaurant");
-        }
         boolean added = DB.addMenuItem(item, restaurant);
         if (!added) throw new RuntimeException("Failed to add menu item");
     }
 
     @Override
-    public void editMenuItem(Manager manager, MenuItem item) {
-        if (manager == null || item == null) {
-            throw new IllegalArgumentException("Manager and menu item must not be null");
+    public void editMenuItem(Restaurant restaurant, MenuItem item) {
+        if (restaurant == null || item == null) {
+            throw new IllegalArgumentException("Restaurant and menu item must not be null");
         }
         validateMenuItem(item);
         boolean ok = DB.updateMenuItem(item);
@@ -52,9 +47,9 @@ public class ManagerService implements IManagerService {
     }
 
     @Override
-    public void removeMenuItem(Manager manager, MenuItem item) {
-        if (manager == null || item == null) {
-            throw new IllegalArgumentException("Manager and menu item must not be null");
+    public void removeMenuItem(Restaurant restaurant, MenuItem item) {
+        if (restaurant == null || item == null) {
+            throw new IllegalArgumentException("Restaurant and menu item must not be null");
         }
         boolean ok = DB.removeMenuItem(item);
         if (!ok) throw new RuntimeException("Failed to remove menu item");
@@ -65,18 +60,28 @@ public class ManagerService implements IManagerService {
         if (manager == null) {
             throw new IllegalArgumentException("Manager must not be null");
         }
-        Restaurant restaurant = getRestaurantDetails(manager);
-        if (restaurant == null) {
+        ArrayList<Restaurant> restaurants = DB.fetchManagerRestaurants(manager);
+        if (restaurants == null || restaurants.isEmpty()) {
             return new ArrayList<>();
         }
-        ArrayList<Order> orders = DB.fetchRestaurantOrders(restaurant);
-        return orders != null ? orders : new ArrayList<>();
+        ArrayList<Order> allOrders = new ArrayList<>();
+        for (Restaurant restaurant : restaurants) {
+            ArrayList<Order> restaurantOrders = DB.fetchRestaurantOrders(restaurant);
+            if (restaurantOrders != null) {
+                for (Order order : restaurantOrders) {
+                    if (order.getStatus() == OrderStatus.PENDING) {
+                        allOrders.add(order);
+                    }
+                }
+            }
+        }
+        return allOrders;
     }
 
     @Override
-    public void updateOrderStatus(Manager manager, Order order, String status) {
-        if (manager == null || order == null || status == null) {
-            throw new IllegalArgumentException("Manager, order and status must not be null");
+    public void updateOrderStatus(Order order, String status) {
+        if (order == null || status == null) {
+            throw new IllegalArgumentException("Order and status must not be null");
         }
         try {
             OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
@@ -146,8 +151,8 @@ public class ManagerService implements IManagerService {
         return 0.0;
     }
 
-    private void saveRestaurantChanges(Manager manager, Restaurant restaurant) {
-        if (manager == null || restaurant == null) return;
+    private void saveRestaurantChanges(Restaurant restaurant) {
+        if (restaurant == null) return;
         DB.saveRestaurantInfo(restaurant);
     }
 }
