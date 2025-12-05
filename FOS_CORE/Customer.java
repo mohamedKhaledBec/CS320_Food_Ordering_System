@@ -23,6 +23,7 @@ public class Customer extends User {
         this.addresses = accountService.fetchCustomerAddresses(this);
         this.orders = accountService.fetchCustomerOrders(this);
         this.cards = accountService.fetchCustomerCards(this);
+        this.cart = new ArrayList<>();
     }
 
     public Customer(String email, String password) {

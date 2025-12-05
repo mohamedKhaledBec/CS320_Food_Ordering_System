@@ -1,10 +1,21 @@
-import FOS_UI.LoginWindow;
+import FOS_UI.*;
 
 import javax.swing.*;
 
 public class main {
         public static void main(String[] args) {
-            SwingUtilities.invokeLater(()->{new LoginWindow().setVisible(true);} );
+            SwingUtilities.invokeLater(()->{            try {
+                MainFrame frame = new MainFrame();
+                frame.setVisible(true);
+            } catch (Exception e) {
+                System.err.println("Failed to create MainFrame: " + e.getMessage());
+                JOptionPane.showMessageDialog(null,
+                        "Failed to start application: " + e.getMessage(),
+                        "Startup Error",
+                        JOptionPane.ERROR_MESSAGE);
+                System.exit(1);
+            }
+            });
             System.out.println("Hello World!");
         }
 }

@@ -1,5 +1,7 @@
 package FOS_CORE;
 
+import java.util.ArrayList;
+
 public class CartService implements ICartService {
 
     @Override
@@ -18,7 +20,7 @@ public class CartService implements ICartService {
         return 0.0;
     }
 
-    private void validateCart(Cart cart) {
+    private void validateCart(ArrayList<MenuItem> cart) {
         // TODO: Implementation
     }
 }

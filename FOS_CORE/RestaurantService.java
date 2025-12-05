@@ -28,7 +28,7 @@ public class RestaurantService implements IRestaurantService {
     }
 
     public ArrayList<String> fetchKeywords(Restaurant restaurant){
-
+        return new ArrayList<>();
     }
 
     private void loadRestaurantData(Restaurant restaurant) {

@@ -1,4 +1,4 @@
-﻿package FOS_UI;
+package FOS_UI;
 
 import FOS_CORE.Customer;
 import FOS_CORE.Manager;

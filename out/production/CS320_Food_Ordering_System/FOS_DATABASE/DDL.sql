@@ -11,19 +11,19 @@ CREATE TABLE User (
 
 CREATE TABLE Address (
 	address_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
+    customer_id INT NOT NULL,
     address_line VARCHAR(100) NOT NULL,
     city VARCHAR(50) NOT NULL,
     state VARCHAR(50),
     zip VARCHAR(10),
-    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
+    FOREIGN KEY (customer_id) REFERENCES User(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Phone (
-    user_id INT NOT NULL,
+    customer_id INT NOT NULL,
     phone_number VARCHAR(15) NOT NULL,
-    PRIMARY KEY (user_id, phone_number),
-    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
+    PRIMARY KEY (customer_id, phone_number),
+    FOREIGN KEY (customer_id) REFERENCES User(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Restaurant (
@@ -43,18 +43,6 @@ CREATE TABLE RestaurantKeyword (
     FOREIGN KEY (restaurant_id) REFERENCES Restaurant(restaurant_id) ON DELETE CASCADE
 );
 
-
-CREATE TABLE Discount (
-    discount_id INT AUTO_INCREMENT PRIMARY KEY,
-    restaurant_id INT NOT NULL,
-    discount_name VARCHAR(50) NOT NULL,
-    discount_description TEXT,
-    discount_value DECIMAL(5,2) NOT NULL CHECK (discount_value >= 0 AND discount_value <= 100),
-    start_date DATETIME NOT NULL,
-    end_date DATETIME NOT NULL,
-    FOREIGN KEY (restaurant_id) REFERENCES Restaurant(restaurant_id) ON DELETE CASCADE
-);
-
 CREATE TABLE MenuItem (
     menu_item_id INT AUTO_INCREMENT PRIMARY KEY,
     restaurant_id INT NOT NULL,
@@ -64,7 +52,20 @@ CREATE TABLE MenuItem (
     FOREIGN KEY (restaurant_id) REFERENCES Restaurant(restaurant_id) ON DELETE CASCADE
 );
 
-CREATE TABLE Order (
+CREATE TABLE Discount (
+    discount_id INT AUTO_INCREMENT PRIMARY KEY,
+    menu_item_id INT NOT NULL,
+    discount_name VARCHAR(50) NOT NULL,
+    discount_description TEXT,
+    discount_percentage DECIMAL(5,2) NOT NULL,
+    start_date DATETIME NOT NULL,
+    end_date DATETIME NOT NULL,
+    CONSTRAINT discount_percentage_chk CHECK (discount_percentage >= 0 AND discount_percentage <= 100),
+    FOREIGN KEY (menu_item_id) REFERENCES MenuItem(menu_item_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE `Order` (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT NOT NULL,
     restaurant_id INT NOT NULL,
@@ -81,7 +82,7 @@ CREATE TABLE CartItem (
     menu_item_id INT NOT NULL,
     quantity INT NOT NULL CHECK (quantity > 0),
     PRIMARY KEY (order_id, menu_item_id),
-    FOREIGN KEY (order_id) REFERENCES Order(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (order_id) REFERENCES `Order`(order_id) ON DELETE CASCADE,
     FOREIGN KEY (menu_item_id) REFERENCES MenuItem(menu_item_id) ON DELETE CASCADE
 );
 
@@ -90,16 +91,16 @@ CREATE TABLE OrderItem (
     menu_item_id INT NOT NULL,
     quantity INT NOT NULL CHECK (quantity > 0),
     PRIMARY KEY (order_id, menu_item_id),
-    FOREIGN KEY (order_id) REFERENCES Order(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (order_id) REFERENCES `Order`(order_id) ON DELETE CASCADE,
     FOREIGN KEY (menu_item_id) REFERENCES MenuItem(menu_item_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Rating (
     order_id INT NOT NULL,
     rating_value INT NOT NULL CHECK (rating_value BETWEEN 1 AND 5),
-    review_text TEXT,
+    rating_comment TEXT,
     PRIMARY KEY (order_id),
-    FOREIGN KEY (order_id) REFERENCES Order(order_id) ON DELETE CASCADE
+    FOREIGN KEY (order_id) REFERENCES `Order`(order_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Card (

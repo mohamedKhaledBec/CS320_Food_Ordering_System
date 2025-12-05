@@ -1,9 +1,9 @@
 package FOS_CORE;
-import java.util.List;
+import java.util.ArrayList;
 
 public interface IOrderService {
-    Order placeOrder(Customer customer, Cart cart, Address address);
+    Order placeOrder(Customer customer, ArrayList<MenuItem> cart, Address address);
     Order trackOrder(String orderID);
-    List<Order> getOrderHistory(Customer customer);
+    ArrayList<Order> getOrderHistory(Customer customer);
     void rateOrder(Order order, int rating, String comment);
 }

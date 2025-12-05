@@ -14,10 +14,7 @@ public class LoginService implements ILoginService {
             return null;
         }
         User user = getUserByEmail(email);
-        if (user == null) {
-            return null;
-        }
-        if (!verifyPassword(user, password)) {
+        if (user == null || !verifyPassword(user, password)) {
             return null;
         }
         return user;

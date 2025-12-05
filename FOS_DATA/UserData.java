@@ -240,7 +240,7 @@ public class UserData implements IUserData {
         ArrayList<Order> orders = new ArrayList<>();
         String sql = "SELECT o.order_id, o.order_date, o.status, r.restaurant_name, \n" +
                 "                       a.address_id,\n" +
-                "                       rt.rating, rt.comment\n" +
+                "                       rt.rating_value, rt.rating_comment\n" +
                 "                FROM Order o\n" +
                 "                JOIN Restaurant r ON o.restaurant_id = r.restaurant_id\n" +
                 "                JOIN Address a ON o.delivery_address_id = a.address_id\n" +
@@ -256,8 +256,9 @@ public class UserData implements IUserData {
                     int order_id = resultSet.getInt("order_id");
                     Date date = resultSet.getDate("order_date");
                     OrderStatus status = OrderStatus.valueOf(resultSet.getString("status"));
-                    Rating rating = new Rating(resultSet.getObject("rating") != null ? resultSet.getInt("rating") : null, resultSet.getString("comment"));
-                    int addressId = resultSet.getInt("address_id");
+                    int ratingValue = resultSet.getInt("rating_value");
+                    String ratingComment = resultSet.getString("rating_comment");
+                    Rating rating = new Rating(ratingValue, ratingComment);                    int addressId = resultSet.getInt("address_id");
                     String addressDetails = fetchAddressDetails(addressId);
                     String restaurantName = resultSet.getString("restaurant_name");
                     ArrayList<CartItem> items = fetchOrderItemsByOrderID(order_id);
@@ -270,10 +271,10 @@ public class UserData implements IUserData {
         }
         return orders;
     }
-    public boolean insertCustomerOrder(Customer customer, Order order, Restaurant restaurant) {
+    public boolean insertCustomerOrder(Customer customer,Address address, Order order, Restaurant restaurant) {
         int customerId = customer.getUserID();
         int restaurantId = restaurant.getRestaurantID();
-        int deliveryAddressId = order.getDeliveryAddress().getAddressID();
+        int deliveryAddressId = address.getAddressID();
         final String sql = "INSERT INTO Orders (customer_id, order_date, restaurant_id, delivery_address_id) VALUES (?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -377,12 +378,34 @@ public class UserData implements IUserData {
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
                 int quantity = resultSet.getInt("quantity");
-                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price);
+                ArrayList<Discount> discounts = fetchDiscountsByMenuItemID(menuItemId);
+                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price, discounts);
                 items.add(new CartItem(menuItem, quantity));
             }
         } catch (SQLException e) {
             System.out.println("Database failed to fetch order items: " + e.getMessage());
         }
         return items;
+    }
+    private ArrayList<Discount> fetchDiscountsByMenuItemID(int menuItemID) {
+        ArrayList<Discount> discounts = new ArrayList<>();
+        final String sql = "SELECT discount_id, discount_name, discount_description, discount_percentage, start_date, end_date FROM Discount WHERE menu_item_id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, menuItemID);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int discountId = resultSet.getInt("discount_id");
+                String discountName = resultSet.getString("discount_name");
+                String discountDescription = resultSet.getString("discount_description");
+                double percentage = resultSet.getDouble("percentage");
+                Date startDate = resultSet.getDate("start_date");
+                Date endDate = resultSet.getDate("end_date");
+                discounts.add(new Discount(discountId,discountName, discountDescription, percentage, startDate, endDate));
+            }
+        } catch (SQLException e) {
+            System.out.println("Database failed to fetch discounts: " + e.getMessage());
+        }
+        return discounts;
     }
 }

@@ -53,8 +53,8 @@ public class DatabaseAPI {
         return DB.fetchCustomerOrders(customer);
     }
 
-    public boolean insertCustomerOrder(Customer customer, Order order, Restaurant restaurant) {
-        return DB.insertCustomerOrder(customer, order, restaurant);
+    public boolean insertCustomerOrder(Customer customer, Address address, Order order, Restaurant restaurant) {
+        return DB.insertCustomerOrder(customer,address, order, restaurant);
     }
 
 }

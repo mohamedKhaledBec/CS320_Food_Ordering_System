@@ -58,7 +58,7 @@ public class Order {
         return rating;
     }
 
-    public Address getDeliveryAddress() {
+    public String getDeliveryAddress() {
         return deliveryAddress;
     }
 

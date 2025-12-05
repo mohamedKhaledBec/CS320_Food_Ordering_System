@@ -1,11 +1,11 @@
 package FOS_CORE;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class OrderService implements IOrderService {
 
     @Override
-    public Order placeOrder(Customer customer, Cart cart, Address address) {
+    public Order placeOrder(Customer customer, ArrayList<MenuItem> cart, Address address) {
         // TODO: Implementation
         return null;
     }
@@ -17,7 +17,7 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public List<Order> getOrderHistory(Customer customer) {
+    public ArrayList<Order> getOrderHistory(Customer customer) {
         // TODO: Implementation
         return null;
     }
@@ -31,7 +31,7 @@ public class OrderService implements IOrderService {
         // TODO: Implementation
     }
 
-    private double calculateOrderTotal(Cart cart) {
+    private double calculateOrderTotal(ArrayList<MenuItem> cart) {
         // TODO: Implementation
         return 0.0;
     }

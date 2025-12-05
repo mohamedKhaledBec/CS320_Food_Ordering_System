@@ -120,7 +120,7 @@ public class RestaurantData implements IRestaurantData {
         ArrayList<Order> orders = new ArrayList<>();
         String sql = "SELECT o.order_id, o.order_date, o.status, \n" +
                 "                       a.address_id,\n" +
-                "                       rt.rating, rt.comment\n" +
+                "                       rt.rating_value, rt.rating_comment\n" +
                 "                FROM Order o\n" +
                 "                JOIN Restaurant r ON o.restaurant_id = r.restaurant_id\n" +
                 "                JOIN Address a ON o.delivery_address_id = a.address_id\n" +
@@ -136,7 +136,9 @@ public class RestaurantData implements IRestaurantData {
                     int order_id = resultSet.getInt("order_id");
                     Date date = resultSet.getDate("order_date");
                     OrderStatus status = OrderStatus.valueOf(resultSet.getString("status"));
-                    Rating rating = new Rating(resultSet.getObject("rating") != null ? resultSet.getInt("rating") : null, resultSet.getString("comment"));
+                    int ratingValue = resultSet.getInt("rating_value");
+                    String ratingComment = resultSet.getString("rating_comment");
+                    Rating rating = new Rating(ratingValue, ratingComment);
                     int addressId = resultSet.getInt("address_id");
                     String deliveryAddress = fetchAddressDetails(addressId);
                     String restaurantName = restaurant.getRestaurantName();
