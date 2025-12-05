@@ -2,8 +2,6 @@ package FOS_CORE;
 
 
 
-import FOS_DATA.IUserData;
-
 import java.util.ArrayList;
 
 public class Customer extends User {

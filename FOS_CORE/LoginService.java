@@ -1,13 +1,10 @@
 package FOS_CORE;
 
-import FOS_DATA.IUserData;
-import FOS_DATA.UserData;
-import org.mindrot.jbcrypt.BCrypt;
-
-import java.util.ArrayList;
+import FOS_DATA.ICustomerData;
+import FOS_DATA.CustomerData;
 
 public class LoginService implements ILoginService {
-    private final IUserData userData = new UserData();
+    private final ICustomerData userData = new CustomerData();
     @Override
     public User login(String email, String password) {
         if (!validateCredentials(email, password)) {

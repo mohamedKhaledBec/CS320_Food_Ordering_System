@@ -87,7 +87,7 @@ INSERT INTO `Order` (customer_id, restaurant_id, order_status, order_date, deliv
 (8, 5, 'delivered', '2025-04-11 16:00:00', 8);
 
 -- ORDER ITEMS
-INSERT INTO OrderItem (order_id, menu_item_id, quantity) VALUES
+INSERT INTO CartItem (order_id, menu_item_id, quantity) VALUES
 (1, 1, 2), (1, 2, 1),
 (2, 4, 3),
 (3, 7, 2), (3, 8, 2),

@@ -4,7 +4,7 @@ import FOS_CORE.*;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class RestaurantData implements IRestaurantData {
+public class ManagerData extends UserData implements IManagerData {
     public boolean saveRestaurantInfo(Restaurant restaurant) {
         String sql = "INSERT INTO Restaurant (manager_id, name, cuisine_type, city) VALUES (?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
@@ -88,6 +88,27 @@ public class RestaurantData implements IRestaurantData {
             return rowsAffected > 0;
         } catch (SQLException e) {
             System.out.println("Database failed to remove menu Item: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean createDiscount(Discount discount, MenuItem menuItem) {
+        String sql = "INSERT INTO Discount (menu_item_id, discount_name, discount_description, discount_percentage, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, menuItem.getMenuItemID());
+            statement.setString(2, discount.getDiscountName());
+            statement.setString(3, discount.getDescription());
+            statement.setDouble(4, discount.getDiscountPercentage());
+            statement.setDate(5, new java.sql.Date(discount.getStartDate().getTime()));
+            statement.setDate(6, new java.sql.Date(discount.getEndDate().getTime()));
+            int rowsAffected = statement.executeUpdate();
+            sql = "SELECT LAST_INSERT_ID() AS discount_id";
+            ResultSet resultSet = statement.executeQuery(sql);
+            discount.setDiscountID(resultSet.getInt("discount_id"));
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Database failed to create discount: " + e.getMessage());
             return false;
         }
     }

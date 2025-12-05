@@ -86,15 +86,6 @@ CREATE TABLE CartItem (
     FOREIGN KEY (menu_item_id) REFERENCES MenuItem(menu_item_id) ON DELETE CASCADE
 );
 
-CREATE TABLE OrderItem (
-    order_id INT NOT NULL,
-    menu_item_id INT NOT NULL,
-    quantity INT NOT NULL CHECK (quantity > 0),
-    PRIMARY KEY (order_id, menu_item_id),
-    FOREIGN KEY (order_id) REFERENCES `Order`(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (menu_item_id) REFERENCES MenuItem(menu_item_id) ON DELETE CASCADE
-);
-
 CREATE TABLE Rating (
     order_id INT NOT NULL,
     rating_value INT NOT NULL CHECK (rating_value BETWEEN 1 AND 5),
