@@ -14,6 +14,26 @@ public class ManagerService implements IManagerService {
     }
 
     @Override
+    public void updateRestaurantInfo(Restaurant restaurant) {
+        // TODO
+    }
+
+    @Override
+    public void addMenuItem(Restaurant restaurant, MenuItem item) {
+        // TODO
+    }
+
+    @Override
+    public void editMenuItem(Restaurant restaurant, MenuItem item) {
+         // TODO
+    }
+
+    @Override
+    public void removeMenuItem(Restaurant restaurant, MenuItem item) {
+        // TODO
+    }
+
+    @Override
     public void updateRestaurantInfo(Manager manager, Restaurant details) {
         if (manager == null || details == null) {
             throw new IllegalArgumentException("Manager and restaurant details must not be null");
@@ -71,6 +91,11 @@ public class ManagerService implements IManagerService {
         }
         ArrayList<Order> orders = DB.fetchRestaurantOrders(restaurant);
         return orders != null ? orders : new ArrayList<>();
+    }
+
+    @Override
+    public void updateOrderStatus(Order order, String status) {
+
     }
 
     @Override
