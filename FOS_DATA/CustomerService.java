@@ -5,29 +5,39 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class CustomerService extends UserData implements ICustomerService {
-    public boolean addNewCustomer(User user){
-        String sql = "INSERT INTO User (username, password, user_type) VALUES (?, ?, ?)";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, user.getEmail());
-            statement.setString(2, user.getPasswordHash());
-            statement.setString(3, "customer");
-            int rowsAffected = statement.executeUpdate();
-            if (rowsAffected > 0) {
-                sql = "SELECT user_id FROM User WHERE username = ?";
-                try (PreparedStatement idStatement = connection.prepareStatement(sql)) {
-                    idStatement.setString(1, user.getEmail());
-                    try (ResultSet resultSet = idStatement.executeQuery()) {
-                        if (resultSet.next()) {
-                            int userId = resultSet.getInt("user_id");
-                            user.setUserID(userId);
-                        }
-                    }
+    public boolean addNewCustomer(Customer customer, String phoneNumber, Address address) {
+        String sql = "INSERT INTO User (email, password, user_type) VALUES (?, ?, ?)";
+        try (Connection connection = DatabaseConnection.getConnection()){
+            connection.setAutoCommit(false);
+            try(PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                statement.setString(1, customer.getEmail());
+                statement.setString(2, customer.getPasswordHash());
+                statement.setString(3, "customer");
+                statement.executeUpdate();
+                ResultSet resultset = statement.getGeneratedKeys();
+                if(!resultset.next()){
+                    connection.rollback();
+                    System.out.println("Failed to retrieve generated user ID");
+                    return false;
                 }
+                customer.setUserID(resultset.getInt(1));
+                if(!addPhoneNumberToCustomer(connection, customer, phoneNumber)){
+                    System.out.println("Failed to add phone number to new customer");
+                    connection.rollback();
+                    return false;
+                }
+                if(!addAddressToCustomer(connection, customer, address)){
+                    System.out.println("Failed to add address to new customer");
+                    connection.rollback();
+                    return false;
+                }
+                System.out.println("Customer phone number added successfully");
+                connection.commit();
+                System.out.println("New customer added successfully with ID: " + customer.getUserID());
                 return true;
             }
         } catch (SQLException e) {
-            System.out.println("Database failed to save user");
+            System.out.println("Database failed to save user" + e.getMessage());
         }
         return false;
     }
@@ -120,16 +130,15 @@ public class CustomerService extends UserData implements ICustomerService {
             statement.setString(3, address.getCity());
             statement.setString(4, address.getState());
             statement.setString(5, address.getZipCode());
-            int rowsAffected = statement.executeUpdate();
-            sql = "SELECT LAST_INSERT_ID() AS address_id";
-            try (PreparedStatement idStatement = connection.prepareStatement(sql);
-                 ResultSet resultSet = idStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    int addressId = resultSet.getInt("address_id");
-                    address.setAddressID(addressId);
-                }
+            statement.executeUpdate();
+            ResultSet resultset = statement.getGeneratedKeys();
+            if(!resultset.next()){
+                connection.rollback();
+                System.out.println("Failed to retrieve generated user ID");
+                return false;
             }
-            return rowsAffected > 0;
+            address.setAddressID(resultset.getInt(1));
+            return true;
         } catch (SQLException e) {
             System.out.println("Database failed to add address to customer");
             return false;
@@ -137,20 +146,20 @@ public class CustomerService extends UserData implements ICustomerService {
     }
 
     @Override
-    public boolean removeAddressFromCustomer(Customer customer, Address address) {
-        int customerId = customer.getUserID();
+    public boolean removeAddressFromCustomer(Customer customer,Address address) {
         int addressId = address.getAddressID();
-        final String sql = "DELETE FROM Address WHERE customer_id = ? AND address_id = ?";
+        final String sql = "DELETE FROM Address WHERE address_id = ?";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, customerId);
-            statement.setInt(2, addressId);
+            statement.setInt(1, addressId);
             int rowsAffected = statement.executeUpdate();
-            return rowsAffected > 0;
+            if(rowsAffected > 0){
+                return true;
+            }
         } catch (SQLException e) {
             System.out.println("Database failed to remove address from customer");
-            return false;
         }
+        return false;
     }
 
     public ArrayList<String> fetchCustomerPhoneNumbers(Customer customer) {
@@ -175,23 +184,21 @@ public class CustomerService extends UserData implements ICustomerService {
     }
     public boolean addPhoneNumberToCustomer(Customer customer, String phoneNumber) {
         int customerId = customer.getUserID();
-        final String sql = "INSERT INTO PhoneNumber (customer_id, phone_number) VALUES (?, ?)";
+        final String sql = "INSERT INTO Phone (customer_id, phone_number) VALUES (?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, customerId);
             statement.setString(2, phoneNumber);
             int rowsAffected = statement.executeUpdate();
-            if(rowsAffected > 0){
-                customer.getPhoneNumbers().add(phoneNumber);
-            }
+            return rowsAffected > 0;
         } catch (SQLException e) {
-            System.out.println("Database failed to add phone number to customer");
+            System.out.println("Database failed to add phone number to customer" + e.getMessage());
         }
         return false;
     }
     public boolean removePhoneNumberFromCustomer(Customer customer, String phoneNumber) {
         int customerId = customer.getUserID();
-        final String sql = "DELETE FROM PhoneNumber WHERE customer_id = ? AND phone_number = ?";
+        final String sql = "DELETE FROM Phone WHERE customer_id = ? AND phone_number = ?";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, customerId);
@@ -261,7 +268,6 @@ public class CustomerService extends UserData implements ICustomerService {
                     if (generatedKeys.next()) {
                         int orderId = generatedKeys.getInt(1);
                         order.setOrderID(orderId);
-                        customer.getOrders().add(order);
                         return true;
                     }
                 }
@@ -312,7 +318,7 @@ public class CustomerService extends UserData implements ICustomerService {
 
     private ArrayList<CartItem> fetchOrderItemsByOrderID(int orderID) {
         ArrayList<CartItem> items = new ArrayList<>();
-        final String sql = "SELECT mi.menu_item_id, mi.item_name, mi.description, mi.price, ci.quantity , ci.price as cart_price" +
+        final String sql = "SELECT mi.menu_item_id, mi.item_name, mi.description, mi.price, ci.quantity , ci.price as cart_price " +
                 "FROM CartItem ci " +
                 "JOIN MenuItem mi ON ci.menu_item_id = mi.menu_item_id " +
                 "WHERE ci.order_id = ?";
@@ -356,5 +362,41 @@ public class CustomerService extends UserData implements ICustomerService {
             System.out.println("Database failed to fetch discounts: " + e.getMessage());
         }
         return discounts;
+    }
+    private boolean addPhoneNumberToCustomer(Connection connection, Customer customer, String phoneNumber) {
+        int customerId = customer.getUserID();
+        final String sql = "INSERT INTO Phone (customer_id, phone_number) VALUES (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, customerId);
+            statement.setString(2, phoneNumber);
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Database failed to add phone number to customer" + e.getMessage());
+        }
+        return false;
+    }
+    private boolean addAddressToCustomer(Connection connection, Customer customer, Address address) {
+        int customerId = customer.getUserID();
+        String sql = "INSERT INTO Address (customer_id, address_line, city, state, zip) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            statement.setInt(1, customerId);
+            statement.setString(2, address.getAddressLine());
+            statement.setString(3, address.getCity());
+            statement.setString(4, address.getState());
+            statement.setString(5, address.getZipCode());
+            statement.executeUpdate();
+            ResultSet resultset = statement.getGeneratedKeys();
+            if(!resultset.next()){
+                connection.rollback();
+                System.out.println("Failed to retrieve generated user ID");
+                return false;
+            }
+            address.setAddressID(resultset.getInt(1));
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Database failed to add address to customer");
+            return false;
+        }
     }
 }

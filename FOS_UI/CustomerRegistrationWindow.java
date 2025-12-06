@@ -1,5 +1,7 @@
 package FOS_UI;
 //Being Implemented by Hassan Askari
+import FOS_CORE.Address;
+import FOS_CORE.Customer;
 import FOS_CORE.IAccountService;
 
 import javax.swing.*;
@@ -97,9 +99,10 @@ public class CustomerRegistrationWindow extends JFrame {
         try
         {
             IAccountService accountService = ServiceContext.getAccountService();
-            boolean created = accountService.createCustomerAccount(email, phone, password);
+            Address address = new Address(-1,"1","1","1","1"); // Placeholder as address is not collected in this form
+            Customer created = accountService.createCustomerAccount(email, phone, password, address);
 
-            if (created)
+            if (created != null)
             {
                 DialogUtils.showInfo(this, "Account created successfully!");
 

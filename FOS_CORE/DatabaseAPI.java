@@ -13,11 +13,6 @@ public class DatabaseAPI {
         this.DB = new CustomerService();
     }
 
-    public boolean addNewCustomer(User user) {
-
-        return DB.addNewCustomer(user);
-    }
-
     public User getUserByEmail(String email) {
         return DB.getUserByEmail(email);
     }

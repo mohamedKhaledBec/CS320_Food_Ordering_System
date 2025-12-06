@@ -24,12 +24,12 @@ public class RestaurantMenuPanel extends JPanel {
         setLayout(new BorderLayout());
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        restaurantNameLabel = new JLabel();
-        restaurantNameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
-        topPanel.add(restaurantNameLabel);
         JButton backButton = new JButton("Back to Restaurants");
         backButton.addActionListener(e -> mainFrame.showRestaurants());
         topPanel.add(backButton);
+        restaurantNameLabel = new JLabel();
+        restaurantNameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
+        topPanel.add(restaurantNameLabel);
         add(topPanel, BorderLayout.NORTH);
 
         menuPanel = new JPanel();
@@ -78,6 +78,8 @@ public class RestaurantMenuPanel extends JPanel {
                 BorderFactory.createLoweredBevelBorder(),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
+        card.setPreferredSize(new Dimension(600, 150));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
 
         JLabel nameLabel = new JLabel(item.getItemName());
         nameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
@@ -126,6 +128,7 @@ public class RestaurantMenuPanel extends JPanel {
         try {
             CartService cartService = mainFrame.getCartService();
             cartService.addToCart(customer, item, quantity, price);
+            mainFrame.getCartPanel().setRestaurantLabel(currentRestaurant.getRestaurantName());
             JOptionPane.showMessageDialog(this,
                     quantity + "x " + item.getItemName() + " added to cart!",
                     "Success",
@@ -133,6 +136,9 @@ public class RestaurantMenuPanel extends JPanel {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Failed to add to cart: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+    public JLabel getRestaurantNameLabel() {
+        return restaurantNameLabel;
     }
 
     private boolean isSameRestaurant() {

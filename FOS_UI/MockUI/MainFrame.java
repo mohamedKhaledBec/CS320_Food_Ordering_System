@@ -162,5 +162,12 @@ public class MainFrame extends JFrame {
     public OrderService getOrderService() {
         return orderService;
     }
+    public RestaurantMenuPanel getMenuPanel() {
+        return menuPanel;
+    }
+    public CartPanel getCartPanel() {
+        return cartPanel;
+    }
 }
+
 

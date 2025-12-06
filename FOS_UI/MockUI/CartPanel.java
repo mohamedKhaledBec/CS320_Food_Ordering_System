@@ -11,6 +11,8 @@ public class CartPanel extends JPanel {
     private MainFrame mainFrame;
     private JPanel cartItemsPanel;
     private JLabel totalLabel;
+    private JLabel restaurantLabel = new JLabel("Your Cart is empty");
+
 
     public CartPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -24,6 +26,8 @@ public class CartPanel extends JPanel {
         JButton backButton = new JButton("Back to Restaurants");
         backButton.addActionListener(e -> mainFrame.showRestaurants());
         topPanel.add(backButton);
+        restaurantLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
+        topPanel.add(restaurantLabel);
         add(topPanel, BorderLayout.NORTH);
 
         cartItemsPanel = new JPanel();
@@ -46,7 +50,7 @@ public class CartPanel extends JPanel {
         cartItemsPanel.removeAll();
         Customer customer = mainFrame.getCurrentCustomer();
         if (customer == null || customer.getCart() == null || customer.getCart().isEmpty()) {
-            cartItemsPanel.add(new JLabel("Your cart is empty."));
+            restaurantLabel.setText("Your Cart is empty");
             totalLabel.setText("Total: $0.00");
         } else {
             double total = 0.0;
@@ -67,6 +71,8 @@ public class CartPanel extends JPanel {
                 BorderFactory.createLoweredBevelBorder(),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
+        card.setPreferredSize(new Dimension(600, 150));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
 
         MenuItem item = cartItem.getItem();
         JLabel nameLabel = new JLabel(item.getItemName());
@@ -155,6 +161,9 @@ public class CartPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Failed to place order: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+    }
+    public void setRestaurantLabel(String restaurantName) {
+        restaurantLabel.setText("Your cart is From      " + restaurantName);
     }
 }
 

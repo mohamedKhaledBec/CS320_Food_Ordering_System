@@ -10,25 +10,16 @@ public class AccountService implements IAccountService {
     private final ICustomerService DB = new CustomerService() ;
     // Working on it : Mohamed Khaled Becetti
     @Override
-    public boolean createCustomerAccount(String email, String phone, String password) {
-        if (!this.validateEmailFormat(email)) {
+    public Customer createCustomerAccount(String email, String phone, String password, Address address) {
+        if (!this.validateEmailFormat(email) && phone != null && !phone.isEmpty()) {
             throw new IllegalArgumentException("Invalid email format");
         } else if (password != null && !password.isEmpty()) {
-            Customer customer = new Customer(-1, email, password);
-            boolean saved = DB.addNewCustomer(customer);
+            Customer customer = new Customer(-1, email, hashPassword(password));
+            boolean saved = DB.addNewCustomer(customer, phone, address);
             if (!saved) {
                 throw new IllegalStateException("Failed to create customer account");
             } else {
-                User created = DB.getUserByEmail(email);
-                if (created instanceof Customer) {
-                    Customer createdCustomer = (Customer)created;
-                    if (phone != null && !phone.isEmpty()) {
-                        DB.addPhoneNumberToCustomer(createdCustomer, phone);
-                    }
-                    return true;
-                } else {
-                    throw new IllegalStateException("Account was created but could not be reloaded as Customer");
-                }
+                return (Customer) DB.getUserByEmail(email);
             }
         } else {
             throw new IllegalArgumentException("Password must not be empty");
@@ -50,19 +41,22 @@ public class AccountService implements IAccountService {
     }
     //Working on it : Mohamed Khaled Becetti
     @Override
-    public void updateContactInfo(Customer customer, String phone) {
+    public void addPhoneNumber(Customer customer, String phone) {
         if (customer == null) {
             throw new IllegalArgumentException("Customer must not be null");
         } else if (phone != null && !phone.isEmpty()) {
-            DB.addPhoneNumberToCustomer(customer, phone);
-            customer.addPhoneNumber(phone);
+            if(DB.addPhoneNumberToCustomer(customer, phone)){
+                customer.addPhoneNumber(phone);
+            }else{
+                throw new IllegalStateException("Failed to add phone number to customer");
+            }
+
         }
     }
     //Working on it : Mohamed Khaled Becetti
     @Override
     public void addAddress(Customer customer, Address address) {
-        boolean added = DB.addAddressToCustomer(customer, address);
-        if (added) {
+        if (DB.addAddressToCustomer(customer, address)) {
             customer.getAddresses().add(address);
         }else{
             throw new IllegalStateException("Failed to add address to customer");
@@ -104,6 +98,9 @@ public class AccountService implements IAccountService {
 
     private User getUserByEmail(String email) {
         return userData.getUserByEmail(email);
+    }
+    private String hashPassword(String password) {
+        return PasswordUtils.hashPassword(password);
     }
     private boolean verifyPassword(User user, String password) {
         return PasswordUtils.verifyPassword(password, user.getPasswordHash());

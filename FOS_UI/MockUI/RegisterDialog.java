@@ -11,6 +11,10 @@ public class RegisterDialog extends JDialog {
     private JPasswordField passwordField;
     private JPasswordField confirmPasswordField;
     private JTextField phoneField;
+    private JTextField addressLineField;
+    private JTextField cityField;
+    private JTextField stateField;
+    private JTextField zipField;
 
     public RegisterDialog(LoginDialog owner) {
         super(owner, "Register New Account", true);
@@ -41,12 +45,36 @@ public class RegisterDialog extends JDialog {
         centerPanel.add(phoneField, gbc);
 
         gbc.gridx = 0; gbc.gridy = 2;
+        centerPanel.add(new JLabel("Address Line:"), gbc);
+        gbc.gridx = 1;
+        addressLineField = new JTextField(20);
+        centerPanel.add(addressLineField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3;
+        centerPanel.add(new JLabel("City:"), gbc);
+        gbc.gridx = 1;
+        cityField = new JTextField(20);
+        centerPanel.add(cityField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 4;
+        centerPanel.add(new JLabel("State:"), gbc);
+        gbc.gridx = 1;
+        stateField = new JTextField(20);
+        centerPanel.add(stateField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 5;
+        centerPanel.add(new JLabel("Zip:"), gbc);
+        gbc.gridx = 1;
+        zipField = new JTextField(20);
+        centerPanel.add(zipField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 6;
         centerPanel.add(new JLabel("Password:"), gbc);
         gbc.gridx = 1;
         passwordField = new JPasswordField(20);
         centerPanel.add(passwordField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0; gbc.gridy = 7;
         centerPanel.add(new JLabel("Confirm Password:"), gbc);
         gbc.gridx = 1;
         confirmPasswordField = new JPasswordField(20);
@@ -68,6 +96,10 @@ public class RegisterDialog extends JDialog {
     private void onRegister() {
         String email = emailField.getText().trim();
         String phone = phoneField.getText().trim();
+        String addressLine = addressLineField.getText().trim();
+        String city = cityField.getText().trim();
+        String state = stateField.getText().trim();
+        String zip = zipField.getText().trim();
         String password = new String(passwordField.getPassword());
         String confirmPassword = new String(confirmPasswordField.getPassword());
 
@@ -83,10 +115,10 @@ public class RegisterDialog extends JDialog {
 
         try {
             AccountService accountService = new AccountService();
-            accountService.createCustomerAccount(email, phone, password);
-            Customer customer = (Customer) accountService.login(email, password);
+            Address address = new Address(-1,addressLine, city, state, zip);
+            accountService.createCustomerAccount(email, phone, password, address);
 
-            this.registeredUser = customer;
+            this.registeredUser = (Customer) accountService.login(email, password);
             JOptionPane.showMessageDialog(this, "Registration successful! Please log in.", "Success", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } catch (Exception e) {

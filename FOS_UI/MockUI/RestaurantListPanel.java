@@ -116,6 +116,8 @@ public class RestaurantListPanel extends JPanel {
                 BorderFactory.createRaisedBevelBorder(),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
+        card.setPreferredSize(new Dimension(600, 150));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
 
         JLabel nameLabel = new JLabel(restaurant.getRestaurantName());
         nameLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));

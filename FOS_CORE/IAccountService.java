@@ -7,9 +7,9 @@ import java.util.ArrayList;
 public interface IAccountService {
     public User login(String email, String password);
     public void logout();
-    boolean createCustomerAccount(String email, String phone, String password);
+    Customer createCustomerAccount(String email, String phone, String password, Address address);
     void changePassword(User user, String newPassword);
-    void updateContactInfo(Customer customer, String phone);
+    void addPhoneNumber(Customer customer, String phone);
     void addAddress(Customer customer, Address address);
     List<Address> getAddresses(Customer customer);
 

@@ -22,7 +22,7 @@ CREATE TABLE Address (
 CREATE TABLE Phone (
     customer_id INT NOT NULL,
     phone_number VARCHAR(15) NOT NULL,
-    PRIMARY KEY (customer_id, phone_number),
+    PRIMARY KEY (phone_number),
     FOREIGN KEY (customer_id) REFERENCES User(user_id) ON DELETE CASCADE
 );
 
