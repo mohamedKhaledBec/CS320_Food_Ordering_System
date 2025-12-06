@@ -7,7 +7,20 @@ public class CartService implements ICartService {
     @Override
     public void addToCart(Customer customer, MenuItem item, int quantity, double price) {
         CartItem cartItem = new CartItem(item, quantity, price);
-        customer.getCart().add(cartItem);
+        ArrayList<CartItem> cart = customer.getCart();
+        ArrayList<MenuItem> menuItems = new ArrayList<>();
+        for(CartItem cartItemTemp: cart){
+            menuItems.add(cartItemTemp.getItem());
+        }
+        if (menuItems.contains(item)){
+            for(CartItem cartItemTemp: cart){
+                if(cartItemTemp.getItem().getMenuItemID() == item.getMenuItemID()){
+                    cartItemTemp.setQuantity(cartItemTemp.getQuantity() + quantity);
+                }
+            }
+        }else {
+            cart.add(cartItem);
+        }
     }
 
     public boolean removeFromCart(Customer customer, MenuItem item) {
