@@ -28,6 +28,9 @@ public class CartPanel extends JPanel {
         topPanel.add(backButton);
         restaurantLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
         topPanel.add(restaurantLabel);
+        JButton emptyCart = new JButton("Empty Cart");
+        emptyCart.addActionListener(e -> {mainFrame.getCurrentCustomer().getCart().clear();});
+        topPanel.add(backButton);
         add(topPanel, BorderLayout.NORTH);
 
         cartItemsPanel = new JPanel();
