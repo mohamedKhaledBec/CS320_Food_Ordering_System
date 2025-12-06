@@ -11,12 +11,12 @@ public class CartService implements ICartService {
         boolean itemExistsInCart = false;
         for(CartItem cartItemTemp: cart){
             if(cartItemTemp.getItem().getMenuItemID() == item.getMenuItemID()){
-                double newQuantity = cartItemTemp.getQuantity() + quantity;
+                int newQuantity = cartItemTemp.getQuantity() + quantity;
                 if(newQuantity > 10) {
                     cartItemTemp.setQuantity(10);
                     throw new IllegalArgumentException("Cannot add more than 10 units of the same item to the cart.\n Current quantity is set to 10.");
                 }
-                cartItemTemp.setQuantity(quantity);
+                cartItemTemp.setQuantity(newQuantity);
                 itemExistsInCart = true;
                 break;
             }
