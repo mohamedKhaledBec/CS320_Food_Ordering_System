@@ -3,7 +3,7 @@ package FOS_UI;
 import FOS_CORE.Customer;
 import FOS_CORE.Manager;
 import FOS_CORE.User;
-
+//worked on by Umair Ahmad
 public final class Session {
 
     private static User currentUser;
