@@ -18,7 +18,7 @@ public final class DialogUtils {
                 parent,
                 message,
                 "Confirm",
-                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE
         );
     }
