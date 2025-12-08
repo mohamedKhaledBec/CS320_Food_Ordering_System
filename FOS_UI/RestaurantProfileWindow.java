@@ -7,8 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 //worked on by Umair Ahmad
-
-public class RestaurantProfileWindow extends JFrame{
+public class RestaurantProfileWindow extends JFrame {
     private JLabel idValueLabel;
     private JTextField nameField;
     private JTextField cityField;
@@ -98,10 +97,10 @@ public class RestaurantProfileWindow extends JFrame{
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    /**
-     * Load restaurant details for the currently logged-in manager
-     * and populate the form fields.
-     */
+
+    // Load restaurant details for the currently logged-in manager
+    // and fill the form fields.
+
 
     private void loadRestaurantDetails() {
         Manager manager = Session.getCurrentManager();
@@ -134,4 +133,47 @@ public class RestaurantProfileWindow extends JFrame{
     }
 
 
+    // Validating inputs
+    // updating the Restaurant object
+    // calling managerService to update Restaurant Info via updateRestaurantInfo(...)
+
+    private void handleSave() {
+        if (currentRestaurant == null) {
+            DialogUtils.showError(this, "No restaurant loaded to update.");
+            return;
+        }
+
+        String name = nameField.getText().trim();
+        String city = cityField.getText().trim();
+        String cuisine = cuisineField.getText().trim();
+
+        if (!InputValidator.isNonEmpty(name) ||
+                !InputValidator.isNonEmpty(city) ||
+                !InputValidator.isNonEmpty(cuisine)) {
+
+            DialogUtils.showError(this, "Please fill in all fields.");
+            return;
+        }
+
+        currentRestaurant.setRestaurantName(name);
+        currentRestaurant.setCity(city);
+        currentRestaurant.setCuisineType(cuisine);
+
+        Manager manager = Session.getCurrentManager();
+
+        if (manager == null) {
+            DialogUtils.showError(this, "No manager is logged in.");
+            return;
+        }
+
+        IManagerService managerService = ServiceContext.getManagerService();
+
+        try {
+            managerService.updateRestaurantInfo(currentRestaurant);
+            DialogUtils.showInfo(this, "Restaurant profile updated successfully.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            DialogUtils.showError(this, "Failed to update restaurant profile: " + ex.getMessage());
+        }
+    }
 }
