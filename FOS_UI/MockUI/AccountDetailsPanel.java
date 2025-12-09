@@ -81,12 +81,12 @@ public class AccountDetailsPanel extends JPanel {
         mainFrame.showOrderHistory();
     }
     public void showAddresses() {
-
+        mainFrame.showAddresses();
     }
     public void showPhoneNumbers() {
         mainFrame.showPhoneNumbers();
     }
     public void showCards() {
-        mainFrame.getCurrentCustomer().getCards();
+        mainFrame.showCards();
     }
 }

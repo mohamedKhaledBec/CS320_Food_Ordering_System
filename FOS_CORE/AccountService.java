@@ -70,6 +70,12 @@ public class AccountService implements IAccountService {
             throw new IllegalStateException("Failed to add address to customer");
         }
     }
+    public void removeAddress(Customer customer, Address address){
+        DB.removeAddressFromCustomer(customer, address);
+    }
+    public void removeCard(Customer customer, Card card){
+        DB.removeCardFromCustomer(customer, card);
+    }
     //Working on it : Mohamed Khaled Becetti
     @Override
     public List<Address> getAddresses(Customer customer) {

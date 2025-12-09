@@ -23,6 +23,8 @@ public class MainFrame extends JFrame {
     private OrderHistoryPanel orderHistoryPanel;
     private AccountDetailsPanel accountDetailsPanel;
     private PhoneNumbersPanel phoneNumbersPanel;
+    private AddressesPanel addressesPanel;
+    private CardsPanel cardsPanel;
 
 
     public MainFrame() {
@@ -53,6 +55,8 @@ public class MainFrame extends JFrame {
         orderHistoryPanel = new OrderHistoryPanel(this);
         accountDetailsPanel = new AccountDetailsPanel(this);
         phoneNumbersPanel = new PhoneNumbersPanel(this);
+        addressesPanel = new AddressesPanel(this);
+        cardsPanel = new CardsPanel(this);
 
         mainPanel.add(restaurantListPanel, "RESTAURANTS");
         mainPanel.add(menuPanel, "MENU");
@@ -60,6 +64,8 @@ public class MainFrame extends JFrame {
         mainPanel.add(orderHistoryPanel, "ORDERS");
         mainPanel.add(accountDetailsPanel, "ACCOUNT DETAILS");
         mainPanel.add(phoneNumbersPanel, "PHONE NUMBERS");
+        mainPanel.add(addressesPanel, "ADDRESSES");
+        mainPanel.add(cardsPanel, "CARDS");
 
         add(mainPanel, BorderLayout.CENTER);
 
@@ -158,6 +164,16 @@ public class MainFrame extends JFrame {
         cardLayout.show(mainPanel, "PHONE NUMBERS");
     }
 
+    public void showAddresses() {
+        addressesPanel.refresh();
+        cardLayout.show(mainPanel, "ADDRESSES");
+    }
+
+    public void showCards() {
+        cardsPanel.refresh();
+        cardLayout.show(mainPanel, "CARDS");
+    }
+
     public void logout() {
         this.setVisible(false);
         this.dispose();
@@ -189,5 +205,7 @@ public class MainFrame extends JFrame {
     public RestaurantListPanel getRestaurantListPanel() {
         return restaurantListPanel;
     }
-    public AccountService getAccountService() {return accountService;}
+    public AccountService getAccountService() {
+        return accountService;
+    }
 }
