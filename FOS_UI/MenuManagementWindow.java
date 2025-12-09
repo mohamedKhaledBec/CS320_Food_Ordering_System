@@ -13,11 +13,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Window for managers to view and edit a restaurant's menu.
- * Uses IRestaurantService to load menu and IManagerService to
- * add / edit / remove items in the database.
- */
+
 public class MenuManagementWindow extends JFrame {
 
     private final Manager manager;
@@ -79,7 +75,7 @@ public class MenuManagementWindow extends JFrame {
 
         add(topPanel, BorderLayout.NORTH);
 
-        // CENTER: table
+
         tableModel = new DefaultTableModel(
                 new Object[]{"Name", "Description", "Price"}, 0
         ) {
@@ -97,10 +93,9 @@ public class MenuManagementWindow extends JFrame {
         JScrollPane tableScroll = new JScrollPane(menuTable);
         add(tableScroll, BorderLayout.CENTER);
 
-        // BOTTOM: editor + buttons
+
         JPanel bottomPanel = new JPanel(new BorderLayout(10, 0));
 
-        // editor
         JPanel formPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(4, 4, 4, 4);
@@ -112,7 +107,6 @@ public class MenuManagementWindow extends JFrame {
         descriptionArea.setLineWrap(true);
         descriptionArea.setWrapStyleWord(true);
 
-        // row 0: name
         gbc.gridx = 0;
         gbc.gridy = 0;
         formPanel.add(new JLabel("Name:"), gbc);
@@ -120,7 +114,7 @@ public class MenuManagementWindow extends JFrame {
         gbc.gridx = 1;
         formPanel.add(nameField, gbc);
 
-        // row 1: price
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         formPanel.add(new JLabel("Price:"), gbc);
@@ -128,7 +122,6 @@ public class MenuManagementWindow extends JFrame {
         gbc.gridx = 1;
         formPanel.add(priceField, gbc);
 
-        // row 2: description
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -141,7 +134,6 @@ public class MenuManagementWindow extends JFrame {
 
         bottomPanel.add(formPanel, BorderLayout.CENTER);
 
-        // buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         addButton = new JButton("Add");
         updateButton = new JButton("Update");
@@ -205,8 +197,6 @@ public class MenuManagementWindow extends JFrame {
         priceField.setText("");
     }
 
-    // ====== BUTTON HANDLERS ======
-
     private void handleAdd() {
         String name = nameField.getText().trim();
         String desc = descriptionArea.getText().trim();
@@ -229,17 +219,13 @@ public class MenuManagementWindow extends JFrame {
         }
 
         try {
-            // Build MenuItem, then persist using IManagerService.addMenuItem(...)
             MenuItem item = new MenuItem();
             item.setItemName(name);
             item.setDescription(desc);
             item.setPrice(price);
-            // If MenuItem has a restaurantId field, ManagerService/DB layer
-            // already gets restaurant as parameter, so this is optional.
 
             managerService.addMenuItem(restaurant, item);
 
-            // Keep local list & table in sync
             menuItems.add(item);
             tableModel.addRow(new Object[]{
                     item.getItemName(),
@@ -288,7 +274,6 @@ public class MenuManagementWindow extends JFrame {
         item.setPrice(price);
 
         try {
-            // Persist using IManagerService.editMenuItem(...)
             managerService.editMenuItem(restaurant, item);
 
             tableModel.setValueAt(name, row, 0);
@@ -316,7 +301,6 @@ public class MenuManagementWindow extends JFrame {
         MenuItem item = menuItems.get(row);
 
         try {
-            // Persist using IManagerService.removeMenuItem(...)
             managerService.removeMenuItem(restaurant, item);
 
             menuItems.remove(row);
