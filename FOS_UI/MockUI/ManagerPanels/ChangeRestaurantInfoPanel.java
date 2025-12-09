@@ -1,16 +1,17 @@
-package FOS_UI;
+package FOS_UI.MockUI.ManagerPanels;
 
 import FOS_CORE.IManagerService;
-import FOS_CORE.Manager;
 import FOS_CORE.Restaurant;
+import FOS_UI.DialogUtils;
+import FOS_UI.InputValidator;
+import FOS_UI.ServiceContext;
 
 import javax.swing.*;
 import java.awt.*;
 
-// worked on by Umair Ahmad
-public class ManageRestaurantPanel extends JFrame {
-
-    private final Manager manager;
+public class ChangeRestaurantInfoPanel extends JPanel {
+    private ManagerMainPanel mainPanel;
+    private Restaurant currentRestaurant;
 
     private JLabel idValueLabel;
     private JTextField nameField;
@@ -18,27 +19,28 @@ public class ManageRestaurantPanel extends JFrame {
     private JTextField cuisineField;
     private JButton saveButton;
     private JButton refreshButton;
-    private JButton closeButton;
 
-    private Restaurant currentRestaurant;
-
-    // pass the manager into the window instead of using Session
-    public ManageRestaurantPanel(Manager manager) {
-        if (manager == null) {
-            throw new IllegalArgumentException("Manager must not be null");
-        }
-        this.manager = manager;
-
-        setTitle("Food Ordering System - Restaurant Profile");
-        setSize(450, 260);
-        setLocationRelativeTo(null); // center
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+    public ChangeRestaurantInfoPanel(ManagerMainPanel mainPanel) {
+        this.mainPanel = mainPanel;
         initComponents();
-        loadRestaurantDetails();
+    }
+
+    public void setRestaurant(Restaurant restaurant) {
+        this.currentRestaurant = restaurant;
+        if (restaurant != null) {
+            loadRestaurantDetails();
+        }
     }
 
     private void initComponents() {
+        setLayout(new BorderLayout());
+
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(e -> mainPanel.showManageRestaurant(mainPanel.getCurrentRestaurant()));
+        topPanel.add(backButton);
+        add(topPanel, BorderLayout.NORTH);
+
         JLabel idLabel = new JLabel("Restaurant ID:");
         idValueLabel = new JLabel("-");
 
@@ -53,11 +55,9 @@ public class ManageRestaurantPanel extends JFrame {
 
         saveButton = new JButton("Save");
         refreshButton = new JButton("Refresh");
-        closeButton = new JButton("Close");
 
         saveButton.addActionListener(e -> handleSave());
         refreshButton.addActionListener(e -> loadRestaurantDetails());
-        closeButton.addActionListener(e -> dispose());
 
         JPanel formPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -71,7 +71,6 @@ public class ManageRestaurantPanel extends JFrame {
         gbc.gridx = 1;
         formPanel.add(idValueLabel, gbc);
 
-
         gbc.gridx = 0;
         gbc.gridy = 1;
         formPanel.add(nameLabel, gbc);
@@ -79,14 +78,12 @@ public class ManageRestaurantPanel extends JFrame {
         gbc.gridx = 1;
         formPanel.add(nameField, gbc);
 
-
         gbc.gridx = 0;
         gbc.gridy = 2;
         formPanel.add(cityLabel, gbc);
 
         gbc.gridx = 1;
         formPanel.add(cityField, gbc);
-
 
         gbc.gridx = 0;
         gbc.gridy = 3;
@@ -98,34 +95,24 @@ public class ManageRestaurantPanel extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(refreshButton);
         buttonPanel.add(saveButton);
-        buttonPanel.add(closeButton);
 
-        getContentPane().setLayout(new BorderLayout());
-        add(formPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(formPanel, BorderLayout.CENTER);
+        centerPanel.add(buttonPanel, BorderLayout.SOUTH);
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        add(centerPanel, BorderLayout.CENTER);
     }
 
     private void loadRestaurantDetails() {
-        IManagerService managerService = ServiceContext.getManagerService();
-
-        try {
-            Restaurant restaurant = managerService.getRestaurantDetails(manager);
-            if (restaurant == null) {
-                DialogUtils.showError(this, "No restaurant profile found for this manager.");
-                return;
-            }
-
-            this.currentRestaurant = restaurant;
-
-            idValueLabel.setText(String.valueOf(restaurant.getRestaurantID()));
-            nameField.setText(restaurant.getRestaurantName());
-            cityField.setText(restaurant.getCity());
-            cuisineField.setText(restaurant.getCuisineType());
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            DialogUtils.showError(this, "Failed to load restaurant details: " + ex.getMessage());
+        if (currentRestaurant == null) {
+            return;
         }
+
+        idValueLabel.setText(String.valueOf(currentRestaurant.getRestaurantID()));
+        nameField.setText(currentRestaurant.getRestaurantName());
+        cityField.setText(currentRestaurant.getCity());
+        cuisineField.setText(currentRestaurant.getCuisineType());
     }
 
     private void handleSave() {
@@ -153,7 +140,6 @@ public class ManageRestaurantPanel extends JFrame {
         IManagerService managerService = ServiceContext.getManagerService();
 
         try {
-
             managerService.updateRestaurantInfo(currentRestaurant);
             DialogUtils.showInfo(this, "Restaurant profile updated successfully.");
         } catch (Exception ex) {
@@ -162,3 +148,4 @@ public class ManageRestaurantPanel extends JFrame {
         }
     }
 }
+

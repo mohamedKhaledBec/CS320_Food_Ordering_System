@@ -5,7 +5,6 @@ import FOS_CORE.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.ArrayList;
 
 public class RestaurantListPanel extends JPanel {
@@ -77,7 +76,9 @@ public class RestaurantListPanel extends JPanel {
         infoPanel.add(cityLabel);
 
         JButton viewMenuButton = new JButton("Manage Restaurant");
-        //viewMenuButton.addActionListener();
+        viewMenuButton.addActionListener(e -> {
+            mainPanel.showManageRestaurant(restaurant);
+        });
 
         card.add(infoPanel, BorderLayout.CENTER);
         card.add(viewMenuButton, BorderLayout.EAST);

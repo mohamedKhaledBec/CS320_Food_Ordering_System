@@ -2,6 +2,7 @@ package FOS_UI.MockUI.ManagerPanels;
 
 import FOS_CORE.Manager;
 import FOS_CORE.ManagerService;
+import FOS_CORE.Restaurant;
 import FOS_UI.MockUI.MainFrame;
 
 import javax.swing.*;
@@ -12,8 +13,13 @@ public class ManagerMainPanel extends JPanel {
     private MainFrame mainFrame;
     private CardLayout cardLayout;
     private RestaurantListPanel restaurantListPanel;
+    private ManageRestaurantPanel manageRestaurantPanel;
+    private EditMenuPanel editMenuPanel;
+    private MonthlyReportPanel monthlyReportPanel;
+    private ChangeRestaurantInfoPanel changeRestaurantInfoPanel;
 
     private Manager currentManager;
+    private Restaurant currentRestaurant;
 
     private ManagerService managerService;
 
@@ -29,8 +35,16 @@ public class ManagerMainPanel extends JPanel {
     private void initComponents() {
 
         restaurantListPanel = new RestaurantListPanel(this);
+        manageRestaurantPanel = new ManageRestaurantPanel(this);
+        editMenuPanel = new EditMenuPanel(this);
+        monthlyReportPanel = new MonthlyReportPanel(this);
+        changeRestaurantInfoPanel = new ChangeRestaurantInfoPanel(this);
 
         add(restaurantListPanel, "MANAGER RESTAURANTS");
+        add(manageRestaurantPanel, "MANAGE RESTAURANT");
+        add(editMenuPanel, "EDIT MENU");
+        add(monthlyReportPanel, "MONTHLY REPORT");
+        add(changeRestaurantInfoPanel, "CHANGE RESTAURANT INFO");
 
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("Menu");
@@ -46,7 +60,28 @@ public class ManagerMainPanel extends JPanel {
 
     public void showRestaurants() {
         restaurantListPanel.refresh();
-        cardLayout.show(this, "RESTAURANTS");
+        cardLayout.show(this, "MANAGER RESTAURANTS");
+    }
+
+    public void showManageRestaurant(Restaurant restaurant) {
+        this.currentRestaurant = restaurant;
+        manageRestaurantPanel.setRestaurant(restaurant);
+        cardLayout.show(this, "MANAGE RESTAURANT");
+    }
+
+    public void showEditMenu() {
+        editMenuPanel.setRestaurant(currentRestaurant);
+        cardLayout.show(this, "EDIT MENU");
+    }
+
+    public void showMonthlyReport() {
+        monthlyReportPanel.setRestaurant(currentRestaurant);
+        cardLayout.show(this, "MONTHLY REPORT");
+    }
+
+    public void showChangeRestaurantInfo() {
+        changeRestaurantInfoPanel.setRestaurant(currentRestaurant);
+        cardLayout.show(this, "CHANGE RESTAURANT INFO");
     }
 
     public ManagerService getManagerService() {
@@ -67,5 +102,13 @@ public class ManagerMainPanel extends JPanel {
 
     public Manager getCurrentManager() {
         return currentManager;
+    }
+
+    public ManageRestaurantPanel getManageRestaurantPanel() {
+        return manageRestaurantPanel;
+    }
+
+    public Restaurant getCurrentRestaurant() {
+        return currentRestaurant;
     }
 }

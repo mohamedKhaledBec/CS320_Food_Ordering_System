@@ -1,43 +1,43 @@
-package FOS_UI;
-
-// Being done by Hassan Askari
+package FOS_UI.MockUI.ManagerPanels;
 
 import FOS_CORE.IManagerService;
 import FOS_CORE.Manager;
 import FOS_CORE.Restaurant;
+import FOS_UI.DialogUtils;
+import FOS_UI.ServiceContext;
 
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Date;
 import java.time.LocalDate;
 
-public class MonthlyReportPanel extends JFrame {
-
-    private final Manager manager; // currently logged-in manager
+public class MonthlyReportPanel extends JPanel {
+    private ManagerMainPanel mainPanel;
+    private Restaurant restaurant;
 
     private JComboBox<String> monthDropdown;
     private JComboBox<String> yearDropdown;
     private JButton generateBtn;
     private JTextArea reportArea;
 
-    public MonthlyReportPanel(Manager manager) {
-        if (manager == null) {
-            throw new IllegalArgumentException("Manager must not be null");
-        }
-        this.manager = manager;
-
-        setTitle("Food Ordering System – Monthly Report");
-        setSize(600, 500);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+    public MonthlyReportPanel(ManagerMainPanel mainPanel) {
+        this.mainPanel = mainPanel;
         initComponents();
     }
 
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
+    }
+
     private void initComponents() {
+        setLayout(new BorderLayout());
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(e -> mainPanel.showManageRestaurant(mainPanel.getCurrentRestaurant()));
+        topPanel.add(backButton);
 
+        JPanel controlsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         monthDropdown = new JComboBox<>(new String[]{
                 "01 - January", "02 - February", "03 - March",
                 "04 - April", "05 - May", "06 - June",
@@ -54,24 +54,25 @@ public class MonthlyReportPanel extends JFrame {
         generateBtn = new JButton("Generate Report");
         generateBtn.addActionListener(e -> onGenerateReport());
 
-        topPanel.add(new JLabel("Month:"));
-        topPanel.add(monthDropdown);
-        topPanel.add(new JLabel("Year:"));
-        topPanel.add(yearDropdown);
-        topPanel.add(generateBtn);
+        controlsPanel.add(new JLabel("Month:"));
+        controlsPanel.add(monthDropdown);
+        controlsPanel.add(new JLabel("Year:"));
+        controlsPanel.add(yearDropdown);
+        controlsPanel.add(generateBtn);
+
+        topPanel.add(controlsPanel);
+        add(topPanel, BorderLayout.NORTH);
 
         reportArea = new JTextArea();
         reportArea.setEditable(false);
         reportArea.setFont(new Font("monospaced", Font.PLAIN, 14));
 
         JScrollPane scrollPane = new JScrollPane(reportArea);
-        getContentPane().setLayout(new BorderLayout());
-        add(topPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
     }
 
     private void onGenerateReport() {
-
+        Manager manager = mainPanel.getCurrentManager();
         if (manager == null) {
             DialogUtils.showError(this, "Only managers can view monthly reports.");
             return;
@@ -79,10 +80,9 @@ public class MonthlyReportPanel extends JFrame {
 
         try {
             IManagerService ms = ServiceContext.getManagerService();
-            Restaurant restaurant = ms.getRestaurantDetails(manager);
 
             if (restaurant == null) {
-                DialogUtils.showError(this, "Restaurant not found for this manager.");
+                DialogUtils.showError(this, "Restaurant not found.");
                 return;
             }
 
@@ -113,3 +113,4 @@ public class MonthlyReportPanel extends JFrame {
         }
     }
 }
+

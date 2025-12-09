@@ -1,10 +1,12 @@
-package FOS_UI;
+package FOS_UI.MockUI.ManagerPanels;
 
 import FOS_CORE.IManagerService;
 import FOS_CORE.IRestaurantService;
-import FOS_CORE.Manager;
 import FOS_CORE.MenuItem;
 import FOS_CORE.Restaurant;
+import FOS_UI.DialogUtils;
+import FOS_UI.InputValidator;
+import FOS_UI.ServiceContext;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -13,11 +15,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class MenuManagementWindow extends JFrame {
-
-    private final Manager manager;
-    private final Restaurant restaurant;
+public class EditMenuPanel extends JPanel {
+    private ManagerMainPanel mainPanel;
+    private Restaurant restaurant;
     private final IRestaurantService restaurantService;
     private final IManagerService managerService;
 
@@ -31,57 +31,38 @@ public class MenuManagementWindow extends JFrame {
     private JButton addButton;
     private JButton updateButton;
     private JButton deleteButton;
-    private JButton closeButton;
 
     private List<MenuItem> menuItems = new ArrayList<>();
 
-    public MenuManagementWindow(Manager manager, Restaurant restaurant) {
-        if (manager == null || restaurant == null) {
-            throw new IllegalArgumentException("Manager and Restaurant must not be null");
-        }
-        this.manager = manager;
-        this.restaurant = restaurant;
+    public EditMenuPanel(ManagerMainPanel mainPanel) {
+        this.mainPanel = mainPanel;
         this.restaurantService = ServiceContext.getRestaurantService();
         this.managerService = ServiceContext.getManagerService();
-
-        setTitle("Edit Menu - " + restaurant.getRestaurantName());
-        setSize(750, 500);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
         initComponents();
-        loadMenu();
+    }
+
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
+        if (restaurant != null) {
+            loadMenu();
+        }
     }
 
     private void initComponents() {
-        getContentPane().setLayout(new BorderLayout(10, 10));
-        ((JComponent) getContentPane()).setBorder(new EmptyBorder(10, 10, 10, 10));
+        setLayout(new BorderLayout());
+        ((JComponent) this).setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // TOP: restaurant info
-        JLabel titleLabel = new JLabel(restaurant.getRestaurantName());
-        titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, 18f));
-        JLabel metaLabel = new JLabel(String.format(
-                "Cuisine: %s    City: %s",
-                restaurant.getCuisineType(),
-                restaurant.getCity()
-        ));
-        metaLabel.setForeground(new Color(90, 90, 90));
-
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
-        topPanel.add(titleLabel);
-        topPanel.add(Box.createVerticalStrut(4));
-        topPanel.add(metaLabel);
-
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(e -> mainPanel.showManageRestaurant(mainPanel.getCurrentRestaurant()));
+        topPanel.add(backButton);
         add(topPanel, BorderLayout.NORTH);
-
 
         tableModel = new DefaultTableModel(
                 new Object[]{"Name", "Description", "Price"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                // We'll edit via the fields, not directly in the table.
                 return false;
             }
         };
@@ -92,7 +73,6 @@ public class MenuManagementWindow extends JFrame {
 
         JScrollPane tableScroll = new JScrollPane(menuTable);
         add(tableScroll, BorderLayout.CENTER);
-
 
         JPanel bottomPanel = new JPanel(new BorderLayout(10, 0));
 
@@ -113,7 +93,6 @@ public class MenuManagementWindow extends JFrame {
 
         gbc.gridx = 1;
         formPanel.add(nameField, gbc);
-
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -138,17 +117,14 @@ public class MenuManagementWindow extends JFrame {
         addButton = new JButton("Add");
         updateButton = new JButton("Update");
         deleteButton = new JButton("Delete");
-        closeButton = new JButton("Close");
 
         addButton.addActionListener(e -> handleAdd());
         updateButton.addActionListener(e -> handleUpdate());
         deleteButton.addActionListener(e -> handleDelete());
-        closeButton.addActionListener(e -> dispose());
 
         buttonPanel.add(addButton);
         buttonPanel.add(updateButton);
         buttonPanel.add(deleteButton);
-        buttonPanel.add(closeButton);
 
         bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -314,3 +290,4 @@ public class MenuManagementWindow extends JFrame {
         }
     }
 }
+
