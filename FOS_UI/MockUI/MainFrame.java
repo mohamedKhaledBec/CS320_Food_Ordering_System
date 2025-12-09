@@ -17,14 +17,18 @@ public class MainFrame extends JFrame {
 
     private JPanel mainPanel;
     private CardLayout cardLayout;
-    private RestaurantListPanel restaurantListPanel;
+    private CustomerRestaurantListPanel customerRestaurantListPanel;
     private RestaurantMenuPanel menuPanel;
     private CartPanel cartPanel;
     private OrderHistoryPanel orderHistoryPanel;
     private AccountDetailsPanel accountDetailsPanel;
     private PhoneNumbersPanel phoneNumbersPanel;
+<<<<<<< HEAD
     private AddressesPanel addressesPanel;
     private CardsPanel cardsPanel;
+=======
+    private ManagerRestaurantListPanel managerRestaurantListPanel;
+>>>>>>> 6eefb329bf498a143328c0edf98b324a5932443e
 
 
     public MainFrame() {
@@ -36,7 +40,7 @@ public class MainFrame extends JFrame {
         showLogin();
     }
 
-    private void initComponents() {
+    private void initComponentsCustomer() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 700);
         setLocationRelativeTo(null);
@@ -49,7 +53,7 @@ public class MainFrame extends JFrame {
             customerAddresses.add(address.toString());
             customerCities.add(address.getCity());
         }
-        restaurantListPanel = new RestaurantListPanel(this);
+        customerRestaurantListPanel = new CustomerRestaurantListPanel(this);
         menuPanel = new RestaurantMenuPanel(this);
         cartPanel = new CartPanel(this);
         orderHistoryPanel = new OrderHistoryPanel(this);
@@ -58,7 +62,7 @@ public class MainFrame extends JFrame {
         addressesPanel = new AddressesPanel(this);
         cardsPanel = new CardsPanel(this);
 
-        mainPanel.add(restaurantListPanel, "RESTAURANTS");
+        mainPanel.add(customerRestaurantListPanel, "RESTAURANTS");
         mainPanel.add(menuPanel, "MENU");
         mainPanel.add(cartPanel, "CART");
         mainPanel.add(orderHistoryPanel, "ORDERS");
@@ -89,6 +93,28 @@ public class MainFrame extends JFrame {
         menuBar.add(menu);
         setJMenuBar(menuBar);
     }
+    private void initComponentsManager() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(900, 700);
+        setLocationRelativeTo(null);
+
+        cardLayout = new CardLayout();
+        mainPanel = new JPanel(cardLayout);
+        managerRestaurantListPanel = new ManagerRestaurantListPanel(this);
+
+        mainPanel.add(managerRestaurantListPanel, "MANAGER RESTAURANTS");
+
+        add(mainPanel, BorderLayout.CENTER);
+
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("Menu");
+        JMenuItem logoutItem = new JMenuItem("Logout");
+
+        logoutItem.addActionListener(e -> logout());
+        menu.add(logoutItem);
+        menuBar.add(menu);
+        setJMenuBar(menuBar);
+    }
 
     // java
     public void showLogin() {
@@ -97,18 +123,15 @@ public class MainFrame extends JFrame {
         User user = loginDialog.getLoggedInUser();
         if (user instanceof Customer) {
             currentCustomer = (Customer) user;
-            initComponents();
+            initComponentsCustomer();
             showRestaurants();
             setVisible(true);
-// java
-// Replace the "else if (user instanceof Manager) { ... }" branch in showLogin()
         } else if (user instanceof Manager) {
-            Manager manager = (Manager) user;
-            currentManager = manager;
-
-            ManagerDashboardWindow dashboard = new ManagerDashboardWindow(manager);
-            dashboard.setVisible(true);
-            this.dispose();
+            currentManager = (Manager) user;
+            initComponentsManager();
+            showManagerRestaurants();
+            setVisible(true);
+            setVisible(true);
         } else {
             System.exit(0);
         }
@@ -119,7 +142,7 @@ public class MainFrame extends JFrame {
             showLogin();
             return;
         }
-        restaurantListPanel.refresh();
+        customerRestaurantListPanel.refresh();
         cardLayout.show(mainPanel, "RESTAURANTS");
     }
 
@@ -164,6 +187,7 @@ public class MainFrame extends JFrame {
         cardLayout.show(mainPanel, "PHONE NUMBERS");
     }
 
+<<<<<<< HEAD
     public void showAddresses() {
         addressesPanel.refresh();
         cardLayout.show(mainPanel, "ADDRESSES");
@@ -172,6 +196,15 @@ public class MainFrame extends JFrame {
     public void showCards() {
         cardsPanel.refresh();
         cardLayout.show(mainPanel, "CARDS");
+=======
+    public void showManagerRestaurants() {
+        if (currentManager == null) {
+            showLogin();
+            return;
+        }
+        managerRestaurantListPanel.refresh();
+        cardLayout.show(mainPanel, "MANAGER RESTAURANTS");
+>>>>>>> 6eefb329bf498a143328c0edf98b324a5932443e
     }
 
     public void logout() {
@@ -202,8 +235,14 @@ public class MainFrame extends JFrame {
     public CartPanel getCartPanel() {
         return cartPanel;
     }
-    public RestaurantListPanel getRestaurantListPanel() {
-        return restaurantListPanel;
+    public CustomerRestaurantListPanel getRestaurantListPanel() {
+        return customerRestaurantListPanel;
+    }
+    public ManagerService getManagerService() {
+        return new ManagerService();
+    }
+    public Manager getCurrentManager() {
+        return currentManager;
     }
     public AccountService getAccountService() {
         return accountService;

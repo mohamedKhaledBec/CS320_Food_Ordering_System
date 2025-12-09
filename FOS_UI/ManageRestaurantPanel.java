@@ -10,7 +10,7 @@ import java.awt.*;
 // worked on by Umair Ahmad
 public class ManageRestaurantPanel extends JFrame {
 
-    private final Manager manager;   // the currently logged-in manager
+    private final Manager manager;
 
     private JLabel idValueLabel;
     private JTextField nameField;
@@ -20,7 +20,6 @@ public class ManageRestaurantPanel extends JFrame {
     private JButton refreshButton;
     private JButton closeButton;
 
-    // keep current restaurant in memory
     private Restaurant currentRestaurant;
 
     // pass the manager into the window instead of using Session
@@ -65,7 +64,6 @@ public class ManageRestaurantPanel extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Row 0: ID (read-only)
         gbc.gridx = 0;
         gbc.gridy = 0;
         formPanel.add(idLabel, gbc);
@@ -73,7 +71,7 @@ public class ManageRestaurantPanel extends JFrame {
         gbc.gridx = 1;
         formPanel.add(idValueLabel, gbc);
 
-        // Row 1: Name
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         formPanel.add(nameLabel, gbc);
@@ -81,7 +79,7 @@ public class ManageRestaurantPanel extends JFrame {
         gbc.gridx = 1;
         formPanel.add(nameField, gbc);
 
-        // Row 2: City
+
         gbc.gridx = 0;
         gbc.gridy = 2;
         formPanel.add(cityLabel, gbc);
@@ -89,7 +87,7 @@ public class ManageRestaurantPanel extends JFrame {
         gbc.gridx = 1;
         formPanel.add(cityField, gbc);
 
-        // Row 3: Cuisine
+
         gbc.gridx = 0;
         gbc.gridy = 3;
         formPanel.add(cuisineLabel, gbc);
@@ -107,7 +105,6 @@ public class ManageRestaurantPanel extends JFrame {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    // Load restaurant details for the current manager and fill the form fields.
     private void loadRestaurantDetails() {
         IManagerService managerService = ServiceContext.getManagerService();
 
@@ -131,7 +128,6 @@ public class ManageRestaurantPanel extends JFrame {
         }
     }
 
-    // Validate inputs, update Restaurant object, and call managerService to persist changes.
     private void handleSave() {
         if (currentRestaurant == null) {
             DialogUtils.showError(this, "No restaurant loaded to update.");
@@ -150,7 +146,6 @@ public class ManageRestaurantPanel extends JFrame {
             return;
         }
 
-        // Update the in-memory restaurant
         currentRestaurant.setRestaurantName(name);
         currentRestaurant.setCity(city);
         currentRestaurant.setCuisineType(cuisine);

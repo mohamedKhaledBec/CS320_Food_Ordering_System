@@ -21,31 +21,25 @@ public class ManagerService extends UserData implements IManagerService {
         }
     }
 
-    public boolean addMenuItem(MenuItem item, Restaurant restaurant) {
-        String sql = "INSERT INTO MenuItem (restaurant_id, item_name, description, price) " +
-                "VALUES (?, ?, ?, ?)";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-
-            ps.setInt(1, restaurant.getRestaurantID());   // adjust getter if needed
-            ps.setString(2, item.getItemName());
-            ps.setString(3, item.getDescription());
-            ps.setDouble(4, item.getPrice());
-
-            int rows = ps.executeUpdate();
-
-            if (rows > 0) {
-                return true;
-            } else {
-                return false;
-            }
+    public boolean addMenuItem(MenuItem menuItem, Restaurant restaurant) {
+        int restaurantId = restaurant.getRestaurantID();
+        String sql = "INSERT INTO MenuItem (restaurant_id, item_name, description, price) VALUES (?, ?, ?, ?)";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, restaurantId);
+            statement.setString(2, menuItem.getItemName());
+            statement.setString(3, menuItem.getDescription());
+            statement.setDouble(4, menuItem.getPrice());
+            int rowsAffected = statement.executeUpdate();
+            sql = "SELECT LAST_INSERT_ID() AS menu_item_id";
+            ResultSet resultSet = statement.executeQuery(sql);
+            menuItem.setMenuItemID(resultSet.getInt("menu_item_id"));
+            return rowsAffected > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Database failed to add menu Item to restaurant: " + e.getMessage());
             return false;
         }
     }
-
 
     public boolean updateMenuItem(MenuItem menuItem) {
         final String sql = "UPDATE MenuItem SET item_name = ?, description = ?, price = ? WHERE menu_item_id = ?";
