@@ -1,5 +1,6 @@
 package FOS_UI;
 
+import FOS_CORE.IManagerService;
 import FOS_CORE.IRestaurantService;
 import FOS_CORE.Manager;
 import FOS_CORE.MenuItem;
@@ -14,13 +15,15 @@ import java.util.List;
 
 /**
  * Window for managers to view and edit a restaurant's menu.
- * UI-only for now; backend persistence can be wired via IManagerService.
+ * Uses IRestaurantService to load menu and IManagerService to
+ * add / edit / remove items in the database.
  */
 public class MenuManagementWindow extends JFrame {
 
     private final Manager manager;
     private final Restaurant restaurant;
     private final IRestaurantService restaurantService;
+    private final IManagerService managerService;
 
     private JTable menuTable;
     private DefaultTableModel tableModel;
@@ -43,6 +46,7 @@ public class MenuManagementWindow extends JFrame {
         this.manager = manager;
         this.restaurant = restaurant;
         this.restaurantService = ServiceContext.getRestaurantService();
+        this.managerService = ServiceContext.getManagerService();
 
         setTitle("Edit Menu - " + restaurant.getRestaurantName());
         setSize(750, 500);
@@ -201,6 +205,8 @@ public class MenuManagementWindow extends JFrame {
         priceField.setText("");
     }
 
+    // ====== BUTTON HANDLERS ======
+
     private void handleAdd() {
         String name = nameField.getText().trim();
         String desc = descriptionArea.getText().trim();
@@ -222,20 +228,31 @@ public class MenuManagementWindow extends JFrame {
             return;
         }
 
-        // Create a new MenuItem in memory.
-        MenuItem item = new MenuItem();
-        item.setItemName(name);
-        item.setDescription(desc);
-        item.setPrice(price);
-        // If your MenuItem has restaurant_id field, set it here as well.
+        try {
+            // Build MenuItem, then persist using IManagerService.addMenuItem(...)
+            MenuItem item = new MenuItem();
+            item.setItemName(name);
+            item.setDescription(desc);
+            item.setPrice(price);
+            // If MenuItem has a restaurantId field, ManagerService/DB layer
+            // already gets restaurant as parameter, so this is optional.
 
-        // TODO: Persist via IManagerService (e.g., managerService.addMenuItem(restaurant, item))
-        // For now, just add to local list & table.
-        menuItems.add(item);
-        tableModel.addRow(new Object[]{name, desc, price});
-        clearForm();
+            managerService.addMenuItem(restaurant, item);
 
-        DialogUtils.showInfo(this, "Menu item added (UI only).\nWire this to IManagerService to save to DB.");
+            // Keep local list & table in sync
+            menuItems.add(item);
+            tableModel.addRow(new Object[]{
+                    item.getItemName(),
+                    item.getDescription(),
+                    item.getPrice()
+            });
+            clearForm();
+
+            DialogUtils.showInfo(this, "Menu item added successfully.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            DialogUtils.showError(this, "Failed to add menu item: " + ex.getMessage());
+        }
     }
 
     private void handleUpdate() {
@@ -270,13 +287,19 @@ public class MenuManagementWindow extends JFrame {
         item.setDescription(desc);
         item.setPrice(price);
 
-        // TODO: Persist changes via IManagerService (e.g., managerService.updateMenuItem(item))
+        try {
+            // Persist using IManagerService.editMenuItem(...)
+            managerService.editMenuItem(restaurant, item);
 
-        tableModel.setValueAt(name, row, 0);
-        tableModel.setValueAt(desc, row, 1);
-        tableModel.setValueAt(price, row, 2);
+            tableModel.setValueAt(name, row, 0);
+            tableModel.setValueAt(desc, row, 1);
+            tableModel.setValueAt(price, row, 2);
 
-        DialogUtils.showInfo(this, "Menu item updated (UI only).\nWire this to IManagerService to save to DB.");
+            DialogUtils.showInfo(this, "Menu item updated successfully.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            DialogUtils.showError(this, "Failed to update menu item: " + ex.getMessage());
+        }
     }
 
     private void handleDelete() {
@@ -292,12 +315,18 @@ public class MenuManagementWindow extends JFrame {
 
         MenuItem item = menuItems.get(row);
 
-        // TODO: Call IManagerService to delete from DB (e.g., managerService.deleteMenuItem(item))
+        try {
+            // Persist using IManagerService.removeMenuItem(...)
+            managerService.removeMenuItem(restaurant, item);
 
-        menuItems.remove(row);
-        tableModel.removeRow(row);
-        clearForm();
+            menuItems.remove(row);
+            tableModel.removeRow(row);
+            clearForm();
 
-        DialogUtils.showInfo(this, "Menu item deleted (UI only).\nWire this to IManagerService to delete from DB.");
+            DialogUtils.showInfo(this, "Menu item deleted successfully.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            DialogUtils.showError(this, "Failed to delete menu item: " + ex.getMessage());
+        }
     }
 }
