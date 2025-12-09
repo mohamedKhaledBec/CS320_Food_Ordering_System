@@ -6,9 +6,8 @@ import FOS_CORE.*;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 
-public class RestaurantListPanel extends JPanel {
+public class CustomerRestaurantListPanel extends JPanel {
     private MainFrame mainFrame;
     private JPanel restaurantPanel;
     private JComboBox<String> cityDropdown;
@@ -16,7 +15,7 @@ public class RestaurantListPanel extends JPanel {
     private ArrayList<Restaurant> restaurants;
     private String selectedAddress;
 
-    public RestaurantListPanel(MainFrame mainFrame) {
+    public CustomerRestaurantListPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         initComponents();
     }
@@ -159,11 +158,11 @@ public class RestaurantListPanel extends JPanel {
         if (mainFrame == null || mainFrame.getCurrentCustomer() == null) {
             return new String[]{"No addresses available"};
         }
-        List<Address> addresses = mainFrame.getCurrentCustomer().getAddresses();
+        ArrayList<Address> addresses = mainFrame.getCurrentCustomer().getAddresses();
         if (addresses == null || addresses.isEmpty()) {
             return new String[]{"No addresses available"};
         }
-        List<String> addressStrings = new ArrayList<>();
+        ArrayList<String> addressStrings = new ArrayList<>();
         for (Address a : addresses) {
             if (a == null) continue;
             String s = (a.toString() != null) ? a.toString().trim() : "";
