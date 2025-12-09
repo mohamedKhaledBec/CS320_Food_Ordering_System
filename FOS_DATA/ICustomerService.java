@@ -23,4 +23,5 @@ public interface ICustomerService extends IUserData {
     public boolean removePhoneNumberFromCustomer(Customer customer, String phoneNumber);
     public ArrayList<Order> fetchCustomerOrders(Customer customer);
     public boolean insertCustomerOrder(Customer customer,Address address, Order order, Restaurant restaurant);
+    public boolean rateCustomerOrder(Order order, int rating, String comment);
 }

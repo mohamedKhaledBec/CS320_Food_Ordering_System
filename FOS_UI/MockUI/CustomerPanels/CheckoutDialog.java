@@ -67,7 +67,6 @@ public class CheckoutDialog extends JDialog {
         addCardButton = new JButton("Add Card");
         addCardButton.addActionListener(e -> addCard());
         buttonPanel.add(addCardButton);
-        payButton = new JButton("Add Card");
         cancelButton = new JButton("Cancel");
         buttonPanel.add(cancelButton);
         if(cardComboBox.getItemCount() != 0){
@@ -81,12 +80,7 @@ public class CheckoutDialog extends JDialog {
         add(buttonPanel, BorderLayout.SOUTH);
 
         cancelButton.addActionListener(e -> dispose());
-        payButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onPay();
-            }
-        });
+        payButton.addActionListener(e -> onPay());
     }
 
     private double calculateCartTotal() {
@@ -103,7 +97,6 @@ public class CheckoutDialog extends JDialog {
                     "You do not have any saved cards. Please add a card first.",
                     "No Card Found",
                     JOptionPane.WARNING_MESSAGE);
-            return;
         }
 
         Card selectedCard = (Card) cardComboBox.getSelectedItem();
@@ -137,7 +130,8 @@ public class CheckoutDialog extends JDialog {
             cardComboBox.addItem(newCard);
             cardComboBox.setSelectedItem(newCard);
         }
-        initComponents();
+        cardComboBox.revalidate();
+        cardComboBox.repaint();
     }
 }
 

@@ -21,12 +21,12 @@ public class CustomerService extends UserData implements ICustomerService {
                     return false;
                 }
                 customer.setUserID(resultset.getInt(1));
-                if(!addPhoneNumberToCustomer(connection, customer, phoneNumber)){
+                if(!addPhoneNumberToCustomerOnLogin(connection, customer, phoneNumber)){
                     System.out.println("Failed to add phone number to new customer");
                     connection.rollback();
                     return false;
                 }
-                if(!addAddressToCustomer(connection, customer, address)){
+                if(!addAddressToCustomerOnLogin(connection, customer, address)){
                     System.out.println("Failed to add address to new customer");
                     connection.rollback();
                     return false;
@@ -122,7 +122,7 @@ public class CustomerService extends UserData implements ICustomerService {
     }
     public boolean addAddressToCustomer(Customer customer, Address address) {
         int customerId = customer.getUserID();
-        String sql = "INSERT INTO Address (customer_id, address_line, city, state, zip_code) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Address (customer_id, address_line, city, state, zip) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, customerId);
@@ -235,7 +235,7 @@ public class CustomerService extends UserData implements ICustomerService {
                     OrderStatus status = OrderStatus.valueOf(resultSet.getString("order_status").toUpperCase());
                     int ratingValue = resultSet.getInt("rating_value");
                     String ratingComment = resultSet.getString("rating_comment");
-                    Rating rating = new Rating(ratingValue, ratingComment);
+                    Rating rating = (ratingValue == 0 && ratingComment == null)? null : new Rating(ratingValue, ratingComment);
                     int addressId = resultSet.getInt("address_id");
                     String addressDetails = fetchAddressDetails(addressId);
                     String restaurantName = resultSet.getString("restaurant_name");
@@ -302,25 +302,23 @@ public class CustomerService extends UserData implements ICustomerService {
         return false;
     }
 
-    //private functions start here
-    private ArrayList<Restaurant> fetchRestaurants() {;
-        ArrayList<Restaurant> restaurants = new ArrayList<>();
-        final String sql = "SELECT restaurant_id, name, cuisine_type, city FROM Restaurant";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                int restaurantId = resultSet.getInt("restaurant_id");
-                String name = resultSet.getString("name");
-                String cuisineType = resultSet.getString("cuisine_type");
-                String city = resultSet.getString("city");
-                restaurants.add(new Restaurant(restaurantId, name, cuisineType, city));
-            }
-        } catch (SQLException e) {
-            System.out.println("Database failed to fetch restaurants");
+    @Override
+    public boolean rateCustomerOrder(Order  order, int rating, String comment) {
+        final String sql = "INSERT INTO Rating (order_id, rating_value, rating_comment) VALUES (?, ?, ?)";
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
+            statement.setInt(1, order.getOrderID());
+            statement.setInt(2, rating);
+            statement.setString(3, comment);
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        }catch (SQLException e){
+            System.out.println("Database failed to rate customer customer");
         }
-        return restaurants;
+        return false;
     }
+
+    //private functions start here
     private String fetchAddressDetails(int addressId){
         final String sql = "SELECT address_line, city, state, zip FROM Address WHERE address_id = ?";
         try (Connection connection = DatabaseConnection.getConnection();
@@ -387,7 +385,7 @@ public class CustomerService extends UserData implements ICustomerService {
         }
         return discounts;
     }
-    private boolean addPhoneNumberToCustomer(Connection connection, Customer customer, String phoneNumber) {
+    private boolean addPhoneNumberToCustomerOnLogin(Connection connection, Customer customer, String phoneNumber) {
         int customerId = customer.getUserID();
         final String sql = "INSERT INTO Phone (customer_id, phone_number) VALUES (?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -400,7 +398,7 @@ public class CustomerService extends UserData implements ICustomerService {
         }
         return false;
     }
-    private boolean addAddressToCustomer(Connection connection, Customer customer, Address address) {
+    private boolean addAddressToCustomerOnLogin(Connection connection, Customer customer, Address address) {
         int customerId = customer.getUserID();
         String sql = "INSERT INTO Address (customer_id, address_line, city, state, zip) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {

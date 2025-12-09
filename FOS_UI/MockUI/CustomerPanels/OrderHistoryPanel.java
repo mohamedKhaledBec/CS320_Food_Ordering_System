@@ -21,8 +21,8 @@ public class OrderHistoryPanel extends JPanel {
         setLayout(new BorderLayout());
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton backButton = new JButton("Back to Restaurants");
-        backButton.addActionListener(e -> mainPanel.showRestaurants());
+        JButton backButton = new JButton("Back to Profile");
+        backButton.addActionListener(e -> mainPanel.showAccountDetails());
         topPanel.add(backButton);
         add(topPanel, BorderLayout.NORTH);
 
@@ -70,21 +70,25 @@ public class OrderHistoryPanel extends JPanel {
         JLabel cardNumberLabel = new JLabel("Paid with Card: **** **** **** " + order.getCardNumber().substring(order.getCardNumber().length() - 4));
         JLabel phoneLabel = new JLabel("Contact Phone: " + order.getPhoneNumber());
 
+        JTextArea itemsArea = new JTextArea(3, 30);
+        itemsArea.setEditable(false);
+        StringBuilder itemsText = new StringBuilder();
+        float total = 0;
+        for (CartItem item : order.getItems()) {
+            itemsText.append(String.format("    %d %s                item price: %.2f \n",  item.getQuantity(), item.getMenuItem().getItemName(), item.getPrice()));
+            total += item.getQuantity() * item.getPrice();
+        }
+        itemsArea.setText(itemsText.toString());
+        JLabel totalPriceLabel = new JLabel("Total Price: " + String.format("%.2f", total));
+
         JPanel infoPanel = new JPanel(new GridLayout(-1, 1));
         infoPanel.add(orderIdLabel);
         infoPanel.add(dateLabel);
         infoPanel.add(statusLabel);
         infoPanel.add(restaurantLabel);
+        infoPanel.add(totalPriceLabel);
         infoPanel.add(cardNumberLabel);
         infoPanel.add(phoneLabel);
-
-        JTextArea itemsArea = new JTextArea(3, 30);
-        itemsArea.setEditable(false);
-        StringBuilder itemsText = new StringBuilder("Items:\n");
-        for (CartItem item : order.getItems()) {
-            itemsText.append(String.format("  - %s x%d\n", item.getMenuItem().getItemName(), item.getQuantity()));
-        }
-        itemsArea.setText(itemsText.toString());
 
         JPanel itemsPanel = new JPanel(new BorderLayout());
         itemsPanel.add(new JLabel("Items:"), BorderLayout.NORTH);
@@ -95,7 +99,8 @@ public class OrderHistoryPanel extends JPanel {
             rateButton.addActionListener(e -> rateOrder(order));
             itemsPanel.add(rateButton, BorderLayout.SOUTH);
         } else if (order.getRating() != null) {
-            JLabel ratingLabel = new JLabel("Rating: " + order.getRating().getRatingValue() + "/5");
+            JLabel ratingLabel = new JLabel("Rating: " + order.getRating().getRatingValue() + "/5" +
+                    (order.getRating().getReviewText().isEmpty() ? "" : " - \"" + order.getRating().getReviewText() + "\""));
             itemsPanel.add(ratingLabel, BorderLayout.SOUTH);
         }
 
@@ -105,23 +110,8 @@ public class OrderHistoryPanel extends JPanel {
     }
 
     private void rateOrder(Order order) {
-        String ratingStr = JOptionPane.showInputDialog(this, "Rate this order (1-5):", "Rate Order", JOptionPane.QUESTION_MESSAGE);
-        if (ratingStr != null) {
-            try {
-                int rating = Integer.parseInt(ratingStr);
-                if (rating < 1 || rating > 5) {
-                    JOptionPane.showMessageDialog(this, "Rating must be between 1 and 5.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                String comment = JOptionPane.showInputDialog(this, "Add a comment (optional):", "Comment", JOptionPane.QUESTION_MESSAGE);
-                OrderService orderService = mainPanel.getOrderService();
-                orderService.rateOrder(order, rating, comment != null ? comment : "");
-                JOptionPane.showMessageDialog(this, "Thank you for your rating!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                refresh();
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Invalid rating value.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        RateOrderDialog rateOrderDialog = new RateOrderDialog(this.mainPanel, order);
+        initComponents();
     }
 }
 

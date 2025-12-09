@@ -39,9 +39,7 @@ public class AddCardDialog extends JDialog {
         add(cvv);
 
         JButton addButton = new JButton("Add Card");
-        addButton.addActionListener(e -> {
-            onAddCard();
-        });
+        addButton.addActionListener(e -> {onAddCard();});
         add(addButton);
         pack();
         setLocationRelativeTo(owner);
@@ -54,6 +52,7 @@ public class AddCardDialog extends JDialog {
         String expiry = expiryDate.getText().trim();
         String cvvCode = cvv.getText().trim();
         Date expiryDate = getDateFromString(expiry) ;
+
 
 
         if (number.isEmpty() || holderName.isEmpty() || expiry.toString().isEmpty() || cvvCode.isEmpty()) {
@@ -78,7 +77,7 @@ public class AddCardDialog extends JDialog {
                 throw new IllegalArgumentException("Invalid date format. Use MM/YY.");
             }
             int month = Integer.parseInt(parts[0]);
-            int year = Integer.parseInt(parts[1]) + 2000; // Assuming 21st century
+            int year = Integer.parseInt(parts[1]) + 2000;
             if (month < 1 || month > 12) {
                 throw new IllegalArgumentException("Month must be between 1 and 12.");
             }

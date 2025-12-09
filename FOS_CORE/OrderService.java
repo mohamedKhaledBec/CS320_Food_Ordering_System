@@ -30,7 +30,11 @@ public class OrderService implements IOrderService {
 
     @Override
     public void rateOrder(Order order, int rating, String comment) {
-        // TODO: Implementation
+        if(DB.rateCustomerOrder(order,rating,comment)){
+            order.setRating(new Rating(rating,comment));
+        }else {
+            throw new IllegalStateException("Failed to rate order");
+        }
     }
 
     private void validateOrder(Order order) {
