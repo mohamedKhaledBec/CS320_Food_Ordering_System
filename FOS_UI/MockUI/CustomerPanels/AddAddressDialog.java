@@ -13,6 +13,7 @@ public class AddAddressDialog extends JDialog{
 
 
     private JTextField address;
+    private JComboBox<String> cityDropdown;
     private JTextField city;
     private JTextField state;
     private JTextField zipCode;
@@ -35,14 +36,15 @@ public class AddAddressDialog extends JDialog{
         address = new JTextField(30);
         addressLabel.add(address);
         JLabel cityLabel = new JLabel("City:");
-        city = new JTextField(30);
+        cityDropdown = new JComboBox<>(getTurkishCities());
+//      city = new JTextField(30);
         state = new JTextField(30);
         zipCode = new JTextField(16);
 
         add(new JLabel("Address Line:"));
         add(address);
         add(new JLabel("City:"));
-        add(city);
+        add(cityDropdown);
         add(new JLabel("State:"));
         add(state);
         add(new JLabel("Zip Code:"));
@@ -55,7 +57,7 @@ public class AddAddressDialog extends JDialog{
 
     private void onAddAddress() {
         String address = this.address.getText().trim();
-        String city = this.city.getText().trim();
+        String city = this.cityDropdown.getSelectedItem().toString();
         String state = this.state.getText().trim();
         String zipCode = this.zipCode.getText().trim();
 
@@ -64,7 +66,7 @@ public class AddAddressDialog extends JDialog{
             return;
         }
 
-        if(!isNumeric(zipCode) || !isStringOnlyLetters(address) || !isStringOnlyLetters(city) || !isStringOnlyLetters(state)){
+        if(!isNumeric(zipCode) || !isStringOnlyLetters(address) || !isStringOnlyLetters(state)){
             JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid address.", "Validation Error", JOptionPane.WARNING_MESSAGE);
         }
 
@@ -95,6 +97,19 @@ public class AddAddressDialog extends JDialog{
             }
         }
         return true;
+    }
+
+    private String[] getTurkishCities(){
+        return new String[]{"Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin",
+                "Aydın", "Balıkesir", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale",
+                "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Edirne", "Elazığ", "Erzincan", "Erzurum",
+                "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari", "Hatay", "Isparta", "Mersin",
+                "İstanbul", "İzmir", "Kars", "Kastamonu", "Kayseri", "Kırklareli", "Kırşehir", "Kocaeli",
+                "Konya", "Kütahya", "Malatya", "Manisa", "Kahramanmaraş", "Mardin", "Muğla", "Muş", "Nevşehir",
+                "Niğde", "Ordu", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas", "Tekirdağ", "Tokat",
+                "Trabzon", "Tunceli", "Şanlıurfa", "Uşak", "Van", "Yozgat", "Zonguldak", "Aksaray", "Bayburt",
+                "Karaman", "Kırıkkale", "Batman", "Şırnak", "Bartın", "Ardahan", "Iğdır", "Yalova", "Karabük",
+                "Kilis", "Osmaniye", "Düzce"};
     }
 
     private boolean isNumeric(String text) {

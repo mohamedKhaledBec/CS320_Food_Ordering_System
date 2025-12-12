@@ -15,7 +15,7 @@ public class ChangeRestaurantInfoPanel extends JPanel {
 
     private JLabel idValueLabel;
     private JTextField nameField;
-    private JTextField cityField;
+    private JComboBox<String> cityField;
     private JTextField cuisineField;
     private JButton saveButton;
     private JButton refreshButton;
@@ -48,7 +48,7 @@ public class ChangeRestaurantInfoPanel extends JPanel {
         nameField = new JTextField(20);
 
         JLabel cityLabel = new JLabel("City:");
-        cityField = new JTextField(20);
+        cityField = new JComboBox<>(getTurkishCities());
 
         JLabel cuisineLabel = new JLabel("Cuisine Type:");
         cuisineField = new JTextField(20);
@@ -111,7 +111,7 @@ public class ChangeRestaurantInfoPanel extends JPanel {
 
         idValueLabel.setText(String.valueOf(currentRestaurant.getRestaurantID()));
         nameField.setText(currentRestaurant.getRestaurantName());
-        cityField.setText(currentRestaurant.getCity());
+        cityField.setSelectedItem(currentRestaurant.getCity());
         cuisineField.setText(currentRestaurant.getCuisineType());
     }
 
@@ -122,7 +122,7 @@ public class ChangeRestaurantInfoPanel extends JPanel {
         }
 
         String name = nameField.getText().trim();
-        String city = cityField.getText().trim();
+        String city = cityField.getSelectedItem().toString();
         String cuisine = cuisineField.getText().trim();
 
         if (!InputValidator.isNonEmpty(name) ||
@@ -147,5 +147,19 @@ public class ChangeRestaurantInfoPanel extends JPanel {
             DialogUtils.showError(this, "Failed to update restaurant profile: " + ex.getMessage());
         }
     }
+
+    private String[] getTurkishCities(){
+        return new String[]{"Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin",
+                "Aydın", "Balıkesir", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale",
+                "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Edirne", "Elazığ", "Erzincan", "Erzurum",
+                "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari", "Hatay", "Isparta", "Mersin",
+                "İstanbul", "İzmir", "Kars", "Kastamonu", "Kayseri", "Kırklareli", "Kırşehir", "Kocaeli",
+                "Konya", "Kütahya", "Malatya", "Manisa", "Kahramanmaraş", "Mardin", "Muğla", "Muş", "Nevşehir",
+                "Niğde", "Ordu", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas", "Tekirdağ", "Tokat",
+                "Trabzon", "Tunceli", "Şanlıurfa", "Uşak", "Van", "Yozgat", "Zonguldak", "Aksaray", "Bayburt",
+                "Karaman", "Kırıkkale", "Batman", "Şırnak", "Bartın", "Ardahan", "Iğdır", "Yalova", "Karabük",
+                "Kilis", "Osmaniye", "Düzce"};
+    }
+
 }
 
