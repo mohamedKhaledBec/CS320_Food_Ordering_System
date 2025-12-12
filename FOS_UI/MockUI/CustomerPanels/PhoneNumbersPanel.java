@@ -25,6 +25,10 @@ public class PhoneNumbersPanel extends JPanel {
         JLabel titleLabel = new JLabel("Phone Numbers");
         titleLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        JButton addButton = new JButton("Add Phone Number");
+        addButton.setBackground(Color.green);
+        addButton.addActionListener(e -> addButtonAction());
+        topPanel.add(addButton, BorderLayout.EAST);
         topPanel.add(titleLabel, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);
 
@@ -76,8 +80,24 @@ public class PhoneNumbersPanel extends JPanel {
         return card;
     }
 
+    private void addButtonAction(){
+        AddPhoneNumberDialog dialog = new AddPhoneNumberDialog(mainPanel);
+        String added = dialog.getAddedPhoneNumber();
+        if(added != null){
+            refresh();
+        }
+    }
+
     private void removeButtonAction(String phoneNumber){
+        Customer customer = mainPanel.getCurrentCustomer();
+        if(customer == null) return;
+
         mainPanel.getMainFrame().getAccountService().removePhoneNumber(mainPanel.getCurrentCustomer(), phoneNumber);
+
+        if(customer.getPhoneNumbers() != null){
+            customer.getPhoneNumbers().remove(phoneNumber);
+        }
+
         refresh();
     }
 }

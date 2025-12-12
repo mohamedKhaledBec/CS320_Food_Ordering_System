@@ -91,7 +91,15 @@ public class AddressesPanel extends JPanel {
         }
     }
     private void removeButtonAction(Address address){
-        mainPanel.getMainFrame().getAccountService().removeAddress(mainPanel.getCurrentCustomer(), address);
-        refresh();
+       Customer customer = mainPanel.getCurrentCustomer();
+       if(customer == null) return;
+
+       mainPanel.getMainFrame().getAccountService().removeAddress(mainPanel.getCurrentCustomer(), address);
+
+       if(customer.getAddresses() != null){
+           customer.getAddresses().remove(address);
+       }
+
+       refresh();
     }
 }
