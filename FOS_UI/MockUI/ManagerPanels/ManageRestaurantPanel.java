@@ -45,6 +45,8 @@ public class ManageRestaurantPanel extends JPanel {
         JButton editMenuButton = createActionButton("Edit Menu");
         JButton monthlyReportButton = createActionButton("Monthly Report");
         JButton changeInfoButton = createActionButton("Change Restaurant Info");
+        JButton manageKeywordsButton = createActionButton("Manage Keywords");
+        JButton manageOrdersButton = createActionButton("Manage Orders");
 
         editMenuButton.addActionListener(e -> {
             if (currentRestaurant == null) {
@@ -79,11 +81,37 @@ public class ManageRestaurantPanel extends JPanel {
             mainPanel.showChangeRestaurantInfo();
         });
 
+        manageKeywordsButton.addActionListener(e -> {
+            if (currentRestaurant == null) {
+                JOptionPane.showMessageDialog(this,
+                        "Restaurant information is missing.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            mainPanel.showManageKeywords();
+        });
+
+        manageOrdersButton.addActionListener(e -> {
+            if (currentRestaurant == null) {
+                JOptionPane.showMessageDialog(this,
+                        "Restaurant information is missing.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            mainPanel.showManageOrders();
+        });
+
         buttonPanel.add(editMenuButton);
         buttonPanel.add(Box.createVerticalStrut(15));
         buttonPanel.add(monthlyReportButton);
         buttonPanel.add(Box.createVerticalStrut(15));
         buttonPanel.add(changeInfoButton);
+        buttonPanel.add(Box.createVerticalStrut(15));
+        buttonPanel.add(manageKeywordsButton);
+        buttonPanel.add(Box.createVerticalStrut(15));
+        buttonPanel.add(manageOrdersButton);
 
         centerPanel.add(metaLabel);
         centerPanel.add(buttonPanel);

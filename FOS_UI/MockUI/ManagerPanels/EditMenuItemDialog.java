@@ -58,8 +58,14 @@ public class EditMenuItemDialog extends JDialog {
         add(new JScrollPane(descriptionArea));
         add(Box.createVerticalStrut(10));
 
-        JButton saveButton = new JButton(menuItem == null ? "Add Menu Item" : "Update Menu Item");
+        JButton saveButton = new JButton("Add Menu Item");
         saveButton.addActionListener(e -> onSave());
+        if(menuItem != null){
+            saveButton.setText("Update Menu Item");
+            JButton manageDiscountsButton = new JButton("Manage Discounts");
+            manageDiscountsButton.addActionListener(e -> onManageDiscounts());
+            add(manageDiscountsButton);
+        }
         add(saveButton);
     }
 
@@ -94,6 +100,10 @@ public class EditMenuItemDialog extends JDialog {
         resultMenuItem.setPrice(price);
 
         dispose();
+    }
+    private void onManageDiscounts(){
+        ManageDiscountsPanel discountsPanel = new ManageDiscountsPanel(this, menuItem);
+        discountsPanel.setVisible(true);
     }
 
     public MenuItem getMenuItem() {

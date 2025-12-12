@@ -9,12 +9,6 @@ public class ManagerService implements IManagerService {
     private final FOS_DATA.ManagerService DB = new FOS_DATA.ManagerService();
 
     @Override
-    public Restaurant getRestaurantDetails(Manager manager) {
-        // TODO: IMPLEMENT
-        return null;
-    }
-
-    @Override
     public ArrayList<Restaurant> getManagerRestaurants(Manager manager) {
         if (manager == null) {
             throw new IllegalArgumentException("Manager must not be null");
@@ -65,29 +59,6 @@ public class ManagerService implements IManagerService {
     }
 
     @Override
-    public ArrayList<Order> viewIncomingOrders(Manager manager) {
-        if (manager == null) {
-            throw new IllegalArgumentException("Manager must not be null");
-        }
-        ArrayList<Restaurant> restaurants = DB.fetchManagerRestaurants(manager);
-        if (restaurants == null || restaurants.isEmpty()) {
-            return new ArrayList<>();
-        }
-        ArrayList<Order> allOrders = new ArrayList<>();
-        for (Restaurant restaurant : restaurants) {
-            ArrayList<Order> restaurantOrders = DB.fetchRestaurantOrders(restaurant);
-            if (restaurantOrders != null) {
-                for (Order order : restaurantOrders) {
-                    if (order.getStatus() == OrderStatus.PENDING) {
-                        allOrders.add(order);
-                    }
-                }
-            }
-        }
-        return allOrders;
-    }
-
-    @Override
     public void updateOrderStatus(Order order, String status) {
         if (order == null || status == null) {
             throw new IllegalArgumentException("Order and status must not be null");
@@ -102,8 +73,10 @@ public class ManagerService implements IManagerService {
 
     @Override
     public String generateMonthlyReport(Manager manager, Restaurant restaurant, Date date) {
-        // TODO: Implementation
-        return null;
+        if (manager == null || restaurant == null || date == null) {
+            throw new IllegalArgumentException("Manager, restaurant, and date must not be null");
+        }
+        return DB.generateMonthlyReport(restaurant, date);
     }
 
     @Override

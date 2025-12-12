@@ -116,7 +116,6 @@ INSERT INTO CartItem (order_id, menu_item_id, price, quantity) VALUES
 INSERT INTO Rating (order_id, rating_value, rating_comment) VALUES
 (1, 5, 'Great pizza!'),
 (6, 4, 'Good but slow'),
-(2, 5, 'Fresh sushi'),
 (7, 4, 'Nice rolls'),
 (3, 5, 'Best burgers'),
 (8, 4, 'Nice fries'),

@@ -83,6 +83,9 @@ INSERT INTO `Order`
 (customer_id, restaurant_id, phone_number, order_status, order_date, delivery_address_id, card_no)
 VALUES
 (4, 1, '555-0101', 'delivered', '2025-04-10 12:00:00', 4, '1111222233334444'),
+(4, 1, '555-0101', 'sent', '2025-12-11 12:00:00', 4, '1111222233334444'),
+(4, 1, '555-0101', 'preparing', '2025-12-11 12:00:00', 4, '1111222233334444'),
+(4, 1, '555-0101', 'pending', '2025-12-11 18:00:00', 4, '1111222233334444'),
 (4, 2, '555-0102', 'delivered', '2025-04-10 13:00:00', 4, '1111222233334444'),
 
 (5, 3, '555-0103', 'delivered', '2025-04-10 14:00:00', 5, '5555666677778888'),
@@ -116,7 +119,6 @@ INSERT INTO CartItem (order_id, menu_item_id, price, quantity) VALUES
 INSERT INTO Rating (order_id, rating_value, rating_comment) VALUES
 (1, 5, 'Great pizza!'),
 (6, 4, 'Good but slow'),
-(2, 5, 'Fresh sushi'),
 (7, 4, 'Nice rolls'),
 (3, 5, 'Best burgers'),
 (8, 4, 'Nice fries'),

@@ -9,4 +9,6 @@ public interface IRestaurantData {
     public ArrayList<Restaurant> fetchRestaurantsByCity(String city);
     public ArrayList<MenuItem> fetchRestaurantMenu(Restaurant restaurant);
     public double calculateRestaurantRating(Restaurant restaurant);
+    public ArrayList<String> fetchRestaurantKeywords(Restaurant restaurant);
+    public ArrayList<Order> fetchRestaurantOrdersForToday(Restaurant restaurant);
 }

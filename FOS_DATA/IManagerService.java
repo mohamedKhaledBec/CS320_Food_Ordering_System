@@ -15,8 +15,6 @@ public interface IManagerService {
 
     public boolean createDiscount(Discount discount, MenuItem menuItem);
 
-    public ArrayList<Order> fetchRestaurantOrders(Restaurant restaurant);
-    public ArrayList<String> fetchRestaurantKeywords(Restaurant restaurant);
     public ArrayList<Restaurant> fetchManagerRestaurants(Manager manager);
 
 }

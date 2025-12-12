@@ -91,66 +91,6 @@ public class ManagerService extends UserData implements IManagerService {
         return false;
     }
 
-    public ArrayList<Order> fetchRestaurantOrders(Restaurant restaurant) {
-        int restaurantId = restaurant.getRestaurantID();
-        ArrayList<Order> orders = new ArrayList<>();
-        String sql = "SELECT o.order_id, o.order_date, o.status, o.phone_number, o.card_no\n" +
-                "                       a.address_id,\n" +
-                "                       rt.rating_value, rt.rating_comment\n" +
-                "                FROM Order o\n" +
-                "                JOIN Restaurant r ON o.restaurant_id = r.restaurant_id\n" +
-                "                JOIN Address a ON o.delivery_address_id = a.address_id\n" +
-                "                LEFT JOIN Rating rt ON o.order_id = rt.cart_id\n" +
-                "                WHERE o.restaurant_id = ?\n" +
-                "                GROUP BY o.order_id, o.order_date, o.status, r.name, rt.rating, rt.comment\n" +
-                "                ORDER BY o.order_date DESC";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, restaurantId);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    int order_id = resultSet.getInt("order_id");
-                    Timestamp date = resultSet.getTimestamp("order_date");
-                    OrderStatus status = OrderStatus.valueOf(resultSet.getString("status"));
-                    int ratingValue = resultSet.getInt("rating_value");
-                    String ratingComment = resultSet.getString("rating_comment");
-                    Rating rating = new Rating(ratingValue, ratingComment);
-                    int addressId = resultSet.getInt("address_id");
-                    String phoneNumber = resultSet.getString("phone_number");
-                    String cardNo = resultSet.getString("card_no");
-                    String deliveryAddress = fetchAddressDetails(addressId);
-                    String restaurantName = restaurant.getRestaurantName();
-                    ArrayList<CartItem> items = fetchOrderItemsByOrderID(order_id);
-                    orders.add(new Order(deliveryAddress, items, date, status, restaurantName, order_id, rating, phoneNumber, cardNo));
-                }
-            } catch (SQLException e) {
-                System.out.println("Database failed to fetch Restaurant orders");
-            }
-            return orders;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public ArrayList<String> fetchRestaurantKeywords(Restaurant restaurant) {
-        final String sql = "SELECT keyword FROM RestaurantKeyword WHERE restaurant_id = ?";
-        ArrayList<String> keywords = new ArrayList<>();
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, restaurant.getRestaurantID());
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                String keyword = resultSet.getString("keyword");
-                keywords.add(keyword);
-            }
-            return keywords;
-        } catch (SQLException e) {
-            System.out.println("Database failed to fetch restaurant keywords: " + e.getMessage());
-            return null;
-        }
-    }
-
-
     public ArrayList<Restaurant> fetchManagerRestaurants(Manager manager) {
         int managerId = manager.getUserID();
         ArrayList<Restaurant> restaurants = new ArrayList<>();
@@ -173,77 +113,137 @@ public class ManagerService extends UserData implements IManagerService {
         return restaurants;
     }
 
+    public String generateMonthlyReport(Restaurant restaurant, Date date) {
+        StringBuilder report = new StringBuilder();
+        int restaurantId = restaurant.getRestaurantID();
 
+        // Calculate start and end dates for the month
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(java.util.Calendar.DAY_OF_MONTH, 1);
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        cal.set(java.util.Calendar.MINUTE, 0);
+        cal.set(java.util.Calendar.SECOND, 0);
+        Timestamp startDate = new Timestamp(cal.getTimeInMillis());
 
-    //private functions start here
-    private String fetchAddressDetails(int addressId){
-        final String sql = "SELECT street, city, state, zip_code, country FROM Address WHERE address_id = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, addressId);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                String street = resultSet.getString("street");
-                String city = resultSet.getString("city");
-                String state = resultSet.getString("state");
-                String zipCode = resultSet.getString("zip_code");
-                String country = resultSet.getString("country");
-                return street + ", " + city + ", " + state + " " + zipCode + ", " + country;
-            }
-        }catch (SQLException e) {
-            System.out.println("Database failed to fetch address details: " + e.getMessage());
-        }
-        return null;
-    }
+        cal.set(java.util.Calendar.DAY_OF_MONTH, cal.getActualMaximum(java.util.Calendar.DAY_OF_MONTH));
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 23);
+        cal.set(java.util.Calendar.MINUTE, 59);
+        cal.set(java.util.Calendar.SECOND, 59);
+        Timestamp endDate = new Timestamp(cal.getTimeInMillis());
 
-    private ArrayList<CartItem> fetchOrderItemsByOrderID(int orderID) {
-        ArrayList<CartItem> items = new ArrayList<>();
-        final String sql = "SELECT mi.menu_item_id, mi.item_name, mi.description, mi.price, oi.quantity, ci.price as cart_price " +
-                "FROM CartItem oi " +
-                "JOIN MenuItem mi ON ci.menu_item_id = mi.menu_item_id " +
-                "WHERE ci.order_id = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, orderID);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                int menuItemId = resultSet.getInt("menu_item_id");
-                String itemName = resultSet.getString("item_name");
-                String description = resultSet.getString("description");
-                double price = resultSet.getDouble("price");
-                int quantity = resultSet.getInt("quantity");
-                int cartPrice = resultSet.getInt("cart_price");
-                MenuItem menuItem = new MenuItem(menuItemId, itemName, description, price);
-                items.add(new CartItem(menuItem, quantity,cartPrice));
-            }
-        } catch (SQLException e) {
-            System.out.println("Database failed to fetch order items: " + e.getMessage());
-        }
-        return items;
-    }
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            // Get total revenue
+            String revenueSql = "SELECT COALESCE(SUM(ci.price * ci.quantity), 0) as total_revenue " +
+                    "FROM `Order` o " +
+                    "JOIN CartItem ci ON o.order_id = ci.order_id " +
+                    "WHERE o.restaurant_id = ? AND o.order_date BETWEEN ? AND ?";
 
-    private ArrayList<Discount> fetchMenuItemDiscounts(MenuItem menuItem) {
-        ArrayList<Discount> discounts = new ArrayList<>();
-        final String sql = "SELECT * FROM Discount WHERE MenuItemID = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                int discountID = resultSet.getInt("discount_id");
-                String discountName = resultSet.getString("discount_name");
-                String discountDescription = resultSet.getString("discount_description");
-                double percentage = resultSet.getDouble("discount_percentage");
-                Timestamp startDate = resultSet.getTimestamp("start_date");
-                Timestamp endDate = resultSet.getTimestamp("end_date");
-                long millis= System.currentTimeMillis();
-                Timestamp currentDate = new Timestamp(millis);
-                Discount discount = new Discount(discountID, discountName, discountDescription, percentage, startDate, endDate);
-                discounts.add(discount);
+            double totalRevenue = 0;
+            try (PreparedStatement stmt = connection.prepareStatement(revenueSql)) {
+                stmt.setInt(1, restaurantId);
+                stmt.setTimestamp(2, startDate);
+                stmt.setTimestamp(3, endDate);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    totalRevenue = rs.getDouble("total_revenue");
                 }
+            }
+
+            // Get number of orders
+            String orderCountSql = "SELECT COUNT(*) as order_count " +
+                    "FROM `Order` WHERE restaurant_id = ? AND order_date BETWEEN ? AND ?";
+
+            int orderCount = 0;
+            try (PreparedStatement stmt = connection.prepareStatement(orderCountSql)) {
+                stmt.setInt(1, restaurantId);
+                stmt.setTimestamp(2, startDate);
+                stmt.setTimestamp(3, endDate);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    orderCount = rs.getInt("order_count");
+                }
+            }
+
+            // Get most popular menu items
+            String popularItemsSql = "SELECT mi.item_name, SUM(ci.quantity) as total_quantity, " +
+                    "SUM(ci.price * ci.quantity) as item_revenue " +
+                    "FROM `Order` o " +
+                    "JOIN CartItem ci ON o.order_id = ci.order_id " +
+                    "JOIN MenuItem mi ON ci.menu_item_id = mi.menu_item_id " +
+                    "WHERE o.restaurant_id = ? AND o.order_date BETWEEN ? AND ? " +
+                    "GROUP BY mi.menu_item_id, mi.item_name " +
+                    "ORDER BY total_quantity DESC " +
+                    "LIMIT 5";
+
+            ArrayList<String> popularItems = new ArrayList<>();
+            try (PreparedStatement stmt = connection.prepareStatement(popularItemsSql)) {
+                stmt.setInt(1, restaurantId);
+                stmt.setTimestamp(2, startDate);
+                stmt.setTimestamp(3, endDate);
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    String itemName = rs.getString("item_name");
+                    int quantity = rs.getInt("total_quantity");
+                    double revenue = rs.getDouble("item_revenue");
+                    popularItems.add(String.format("  %s - %d orders ($%.2f)", itemName, quantity, revenue));
+                }
+            }
+
+            // Get average rating
+            String ratingSql = "SELECT AVG(rt.rating_value) as avg_rating, COUNT(rt.rating_value) as rating_count " +
+                    "FROM `Order` o " +
+                    "LEFT JOIN Rating rt ON o.order_id = rt.order_id " +
+                    "WHERE o.restaurant_id = ? AND o.order_date BETWEEN ? AND ?";
+
+            double avgRating = 0;
+            int ratingCount = 0;
+            try (PreparedStatement stmt = connection.prepareStatement(ratingSql)) {
+                stmt.setInt(1, restaurantId);
+                stmt.setTimestamp(2, startDate);
+                stmt.setTimestamp(3, endDate);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    avgRating = rs.getDouble("avg_rating");
+                    ratingCount = rs.getInt("rating_count");
+                }
+            }
+
+            // Build the report
+            report.append("========================================\n");
+            report.append("       MONTHLY REPORT\n");
+            report.append("========================================\n");
+            report.append(String.format("Restaurant: %s\n", restaurant.getRestaurantName()));
+            report.append(String.format("Period: %s to %s\n\n",
+                    new java.text.SimpleDateFormat("yyyy-MM-dd").format(startDate),
+                    new java.text.SimpleDateFormat("yyyy-MM-dd").format(endDate)));
+
+            report.append("SUMMARY\n");
+            report.append("----------------------------------------\n");
+            report.append(String.format("Total Revenue: $%.2f\n", totalRevenue));
+            report.append(String.format("Total Orders: %d\n", orderCount));
+            report.append(String.format("Average Order Value: $%.2f\n",
+                    orderCount > 0 ? totalRevenue / orderCount : 0));
+            report.append(String.format("Average Rating: %.2f (%d ratings)\n\n", avgRating, ratingCount));
+
+            report.append("TOP 5 MENU ITEMS\n");
+            report.append("----------------------------------------\n");
+            if (popularItems.isEmpty()) {
+                report.append("  No orders this month\n");
+            } else {
+                for (String item : popularItems) {
+                    report.append(item).append("\n");
+                }
+            }
+            report.append("\n========================================\n");
+
         } catch (SQLException e) {
-            System.out.println("Database failed to fetch Menu Item Discounts: " + e.getMessage());
+            System.out.println("Database failed to generate monthly report: " + e.getMessage());
+            e.printStackTrace();
+            return "Error generating report: " + e.getMessage();
         }
-        return discounts;
+
+        return report.toString();
     }
 
 }

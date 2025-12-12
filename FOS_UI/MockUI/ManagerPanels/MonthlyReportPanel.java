@@ -5,18 +5,18 @@ import FOS_CORE.Manager;
 import FOS_CORE.Restaurant;
 import FOS_UI.DialogUtils;
 import FOS_UI.ServiceContext;
-
+import com.toedter.calendar.*;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Date;
-import java.time.LocalDate;
+import java.util.Calendar;
 
 public class MonthlyReportPanel extends JPanel {
     private ManagerMainPanel mainPanel;
     private Restaurant restaurant;
 
-    private JComboBox<String> monthDropdown;
-    private JComboBox<String> yearDropdown;
+    private JMonthChooser monthChooser;
+    private JYearChooser yearChooser;
     private JButton generateBtn;
     private JTextArea reportArea;
 
@@ -38,26 +38,17 @@ public class MonthlyReportPanel extends JPanel {
         topPanel.add(backButton);
 
         JPanel controlsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        monthDropdown = new JComboBox<>(new String[]{
-                "01 - January", "02 - February", "03 - March",
-                "04 - April", "05 - May", "06 - June",
-                "07 - July", "08 - August", "09 - September",
-                "10 - October", "11 - November", "12 - December"
-        });
 
-        yearDropdown = new JComboBox<>();
-        int currentYear = LocalDate.now().getYear();
-        for (int y = currentYear; y >= currentYear - 5; y--) {
-            yearDropdown.addItem(String.valueOf(y));
-        }
+        monthChooser = new JMonthChooser();
+        yearChooser = new JYearChooser();
 
         generateBtn = new JButton("Generate Report");
         generateBtn.addActionListener(e -> onGenerateReport());
 
         controlsPanel.add(new JLabel("Month:"));
-        controlsPanel.add(monthDropdown);
+        controlsPanel.add(monthChooser);
         controlsPanel.add(new JLabel("Year:"));
-        controlsPanel.add(yearDropdown);
+        controlsPanel.add(yearChooser);
         controlsPanel.add(generateBtn);
 
         topPanel.add(controlsPanel);
@@ -86,18 +77,15 @@ public class MonthlyReportPanel extends JPanel {
                 return;
             }
 
-            String monthString = (String) monthDropdown.getSelectedItem();
-            String yearString = (String) yearDropdown.getSelectedItem();
-            if (monthString == null || yearString == null) {
-                DialogUtils.showError(this, "Please select both month and year.");
-                return;
-            }
+            int month = monthChooser.getMonth() + 1;
+            int year = yearChooser.getYear();
 
-            int month = Integer.parseInt(monthString.substring(0, 2));
-            int year = Integer.parseInt(yearString);
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.YEAR, year);
+            cal.set(Calendar.MONTH, month - 1);
+            cal.set(Calendar.DAY_OF_MONTH, 1);
 
-            LocalDate date = LocalDate.of(year, month, 1);
-            Date sqlDate = Date.valueOf(date);
+            Date sqlDate = new Date(cal.getTimeInMillis());
 
             String report = ms.generateMonthlyReport(manager, restaurant, sqlDate);
 
@@ -113,4 +101,3 @@ public class MonthlyReportPanel extends JPanel {
         }
     }
 }
-

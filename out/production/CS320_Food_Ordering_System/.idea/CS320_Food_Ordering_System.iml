@@ -12,5 +12,6 @@
     <orderEntry type="library" name="jbcrypt-0.4" level="project" />
     <orderEntry type="library" name="mysql-connector-j-9.5.0" level="project" />
     <orderEntry type="library" name="jbcrypt-0.4" level="project" />
+    <orderEntry type="library" name="jcalendar-1.4" level="project" />
   </component>
 </module>

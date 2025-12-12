@@ -9,4 +9,5 @@ public interface IRestaurantService {
     public ArrayList<Restaurant> searchRestaurantsByKeyword(String keyword, ArrayList<Restaurant> inRestaurants);
     public double calculateMenuItemDiscount(MenuItem item);
     public double calculateRestaurantRating(Restaurant restaurant);
+    public ArrayList<Order> fetchRestaurantOrdersForToday(Restaurant restaurant);
 }

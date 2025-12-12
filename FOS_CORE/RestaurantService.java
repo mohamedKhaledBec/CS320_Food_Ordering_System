@@ -40,7 +40,7 @@ public class RestaurantService implements IRestaurantService {
     }
 
     public ArrayList<String> fetchRestaurantKeywords(Restaurant restaurant){
-        return new ArrayList<>();
+        return DB.fetchRestaurantKeywords(restaurant);
     }
 
     public ArrayList<Discount> fetchMenuItemDiscounts(MenuItem item){
@@ -68,7 +68,7 @@ public class RestaurantService implements IRestaurantService {
         return DB.calculateRestaurantRating(restaurant);
     }
 
-    private void loadRestaurantData(Restaurant restaurant) {
-        // TODO: Implementation
+    public ArrayList<Order> fetchRestaurantOrdersForToday(Restaurant restaurant) {
+        return DB.fetchRestaurantOrdersForToday(restaurant);
     }
 }
