@@ -27,11 +27,17 @@ public class CartServiceTest {
     }
 
     private String uniqueEmail() {
-        return "user+" + UUID.randomUUID() + "@test.com";
+        return "user_" + UUID.randomUUID() + "@test.com";
     }
+    private String uniquePhone() {
+        String digits = UUID.randomUUID().toString().replaceAll("\\D", "");
+        String last7 = digits.substring(digits.length() - 7);
+        return "555" + last7;
+    }
+
     private Customer createCustomer() {
         String email = uniqueEmail();
-        String phone = "5550000000";
+        String phone = uniquePhone();
         String password = "StrongPass123!";
         accountService.createCustomerAccount(email, phone, password, baseAddress);
         User user = accountService.login(email, password);
@@ -85,12 +91,25 @@ public class CartServiceTest {
     @Test
     void testAddMultipleItems() {
         Customer customer = createCustomer();
-        MenuItem item1 = createMenuItem();
-        MenuItem item2 = createMenuItem();
+        MenuItem item = createMenuItem();
 
-        cartService.addToCart(customer, item1, 1, 7.5);
-        cartService.addToCart(customer, item2, 2, 3.0);
+        cartService.addToCart(customer, item, 1, 7.5);
+        cartService.addToCart(customer, item, 2, 7.5);
 
-        assertEquals(2, customer.getCart().size());
+        assertEquals(1, customer.getCart().size());
+        CartItem cartItem = customer.getCart().get(0);
+        assertEquals(3, cartItem.getQuantity());
+    }
+    @Test
+    void testRemoveFromCart() {
+        Customer customer = createCustomer();
+        MenuItem item = createMenuItem();
+
+        cartService.addToCart(customer, item, 2, 10.0);
+        assertFalse(customer.getCart().isEmpty());
+
+        cartService.removeFromCart(customer, item);
+
+        assertTrue(customer.getCart().isEmpty());
     }
 }

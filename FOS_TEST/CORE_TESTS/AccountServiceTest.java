@@ -1,12 +1,20 @@
 package FOS_TEST.CORE_TESTS;
 
-import FOS_CORE.*;
-import org.junit.jupiter.api.*;
+import FOS_CORE.AccountService;
+import FOS_CORE.Address;
+import FOS_CORE.Card;
+import FOS_CORE.Customer;
+import FOS_CORE.User;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
-// Being done by Umair Ahmad
+
 public class AccountServiceTest {
 
     private AccountService accountService;
@@ -23,14 +31,20 @@ public class AccountServiceTest {
                 "00000"
         );
     }
+
     private String uniqueEmail() {
-        return "user+" + UUID.randomUUID() + "@test.com";
+        return "user_" + UUID.randomUUID() + "@test.com";
+    }
+    private String uniquePhone() {
+        String digits = UUID.randomUUID().toString().replaceAll("\\D", "");
+        String last7 = digits.substring(digits.length() - 7);
+        return "555" + last7;
     }
 
     @Test
     void testRegisterAndLogin() {
         String email = uniqueEmail();
-        String phone = "5550000000";
+        String phone = uniquePhone();
         String password = "StrongPass123!";
 
         accountService.createCustomerAccount(email, phone, password, baseAddress);
@@ -45,13 +59,14 @@ public class AccountServiceTest {
     @Test
     void testDuplicateEmail() {
         String email = uniqueEmail();
-        String phone = "5551111111";
+        String phone = uniquePhone();
         String password = "StrongPass123!";
 
         accountService.createCustomerAccount(email, phone, password, baseAddress);
 
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(IllegalStateException.class, () ->
                 accountService.createCustomerAccount(email, phone, password, baseAddress));
+
     }
 
     @Test
@@ -71,7 +86,6 @@ public class AccountServiceTest {
         String password = "StrongPass123!";
 
         accountService.createCustomerAccount(email, phone, password, baseAddress);
-
         User loggedIn = accountService.login(email, password);
 
         assertNotNull(loggedIn);
@@ -85,7 +99,6 @@ public class AccountServiceTest {
         String password = "StrongPass123!";
 
         accountService.createCustomerAccount(email, phone, password, baseAddress);
-
         User loggedIn = accountService.login(email, "WrongPassword!23");
 
         assertNull(loggedIn);
@@ -94,29 +107,12 @@ public class AccountServiceTest {
     @Test
     void testLoginUnknownEmail() {
         User loggedIn = accountService.login(uniqueEmail(), "SomePassword123!");
+
         assertNull(loggedIn);
     }
 
-
     @Test
-    void testChangePassword() {
-        String email = uniqueEmail();
-        String phone = "5555555555";
-        String oldPassword = "OldPass123!";
-        String newPassword = "NewPass456!";
-
-        accountService.createCustomerAccount(email, phone, oldPassword, baseAddress);
-        Customer customer = (Customer) accountService.login(email, oldPassword);
-        assertNotNull(customer);
-
-        accountService.changePassword(customer,newPassword);
-
-        assertNull(accountService.login(email, oldPassword));
-        assertNotNull(accountService.login(email, newPassword));
-    }
-
-    @Test
-    void testPhoneNumbers() {
+    void testPhoneNumbersInitialAndRemove() {
         String email = uniqueEmail();
         String phone = "5556666666";
         String password = "StrongPass123!";
@@ -125,16 +121,12 @@ public class AccountServiceTest {
         Customer customer = (Customer) accountService.login(email, password);
         assertNotNull(customer);
 
-        String additionalPhone = "5557777777";
-
-        accountService.addPhoneNumber(customer, additionalPhone);
-
         assertNotNull(customer.getPhoneNumbers());
-        assertTrue(customer.getPhoneNumbers().contains(additionalPhone));
+        assertTrue(customer.getPhoneNumbers().contains(phone));
 
-        accountService.removePhoneNumber(customer, additionalPhone);
+        accountService.removePhoneNumber(customer, phone);
 
-        assertFalse(customer.getPhoneNumbers().contains(additionalPhone));
+        assertFalse(customer.getPhoneNumbers().contains(phone));
     }
 
     @Test

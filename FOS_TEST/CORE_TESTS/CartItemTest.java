@@ -29,12 +29,17 @@ public class CartItemTest {
 
 
     private String uniqueEmail() {
-        return "user+" + UUID.randomUUID() + "@test.com";
+        return "user_" + UUID.randomUUID() + "@test.com";
+    }
+    private String uniquePhone() {
+        String digits = UUID.randomUUID().toString().replaceAll("\\D", "");
+        String last7 = digits.substring(digits.length() - 7);
+        return "555" + last7;
     }
 
     private Customer createCustomer() {
         String email = uniqueEmail();
-        String phone = "5550000000";
+        String phone = uniquePhone();
         String password = "StrongPass123!";
         accountService.createCustomerAccount(email, phone, password, baseAddress);
         User user = accountService.login(email, password);
