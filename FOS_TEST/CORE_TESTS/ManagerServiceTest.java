@@ -38,6 +38,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Returns restaurants fetched from DB stub
+	 * @tests Verifies getManagerRestaurants() delegates to data layer and returns its result. */
 	void getManagerRestaurantsReturnsDbResult() {
 		Restaurant r = newRestaurant(1, "R1", "Italian", "City");
 		dbStub.restaurantsResult.add(r);
@@ -48,11 +50,15 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Rejects null manager inputs
+	 * @tests Ensures validation throws IllegalArgumentException for null manager. */
 	void getManagerRestaurantsRejectsNullManager() {
 		assertThrows(IllegalArgumentException.class, () -> service.getManagerRestaurants(null));
 	}
 
 	@Test
+	/* @brief Saves restaurant info successfully
+	 * @tests Confirms updateRestaurantInfo() calls save twice (direct + internal). */
 	void updateRestaurantInfoValidSavesTwice() {
 		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
 
@@ -62,17 +68,23 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Null restaurant is invalid
+	 * @tests Validates null input throws IllegalArgumentException. */
 	void updateRestaurantInfoRejectsNullRestaurant() {
 		assertThrows(IllegalArgumentException.class, () -> service.updateRestaurantInfo(null));
 	}
 
 	@Test
+	/* @brief Empty restaurant name is rejected
+	 * @tests Ensures trimmed-empty names cause IllegalArgumentException. */
 	void updateRestaurantInfoRejectsEmptyName() {
 		Restaurant r = newRestaurant(1, " ", "Cuisine", "City");
 		assertThrows(IllegalArgumentException.class, () -> service.updateRestaurantInfo(r));
 	}
 
 	@Test
+	/* @brief Propagates DB failure on save
+	 * @tests Confirms updateRestaurantInfo() throws when DB returns false. */
 	void updateRestaurantInfoFailsWhenDbReturnsFalse() {
 		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
 		dbStub.saveRestaurantInfoResult = false;
@@ -80,6 +92,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Add menu item delegates to DB
+	 * @tests Verifies addMenuItem() passes to data layer and succeeds. */
 	void addMenuItemValidDelegatesToDb() {
 		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
@@ -89,6 +103,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Add menu item rejects nulls
+	 * @tests Ensures null restaurant or item throws IllegalArgumentException. */
 	void addMenuItemRejectsNulls() {
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
 		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
@@ -97,6 +113,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Add menu item validates fields
+	 * @tests Confirms negative price or blank name triggers IllegalArgumentException. */
 	void addMenuItemRejectsInvalidItem() {
 		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
 		MenuItem badPrice = newMenuItem("Burger", "desc", -1);
@@ -106,6 +124,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Add menu item failure bubbles up
+	 * @tests Verifies RuntimeException is thrown when DB add fails. */
 	void addMenuItemPropagatesDbFailure() {
 		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
@@ -114,6 +134,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Edit menu item delegates to DB
+	 * @tests Confirms editMenuItem() invokes update in data layer. */
 	void editMenuItemValidDelegates() {
 		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
@@ -123,6 +145,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Edit menu item failure bubbles up
+	 * @tests Ensures RuntimeException when DB update fails. */
 	void editMenuItemPropagatesDbFailure() {
 		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
@@ -131,6 +155,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Remove menu item delegates to DB
+	 * @tests Verifies removeMenuItem() invokes data layer removal. */
 	void removeMenuItemValidDelegates() {
 		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
@@ -140,6 +166,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Remove menu item failure bubbles up
+	 * @tests Confirms RuntimeException when DB remove fails. */
 	void removeMenuItemPropagatesDbFailure() {
 		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
@@ -148,6 +176,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Order status updates with valid value
+	 * @tests Ensures string status maps to enum and sets on order. */
 	void updateOrderStatusSetsValidEnum() {
 		Order order = new Order("addr", new ArrayList<>(), "rest", "phone", "card");
 		service.updateOrderStatus(order, "delivered");
@@ -155,12 +185,16 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Invalid order status rejected
+	 * @tests Validates IllegalArgumentException for unknown status string. */
 	void updateOrderStatusRejectsInvalidValue() {
 		Order order = new Order("addr", new ArrayList<>(), "rest", "phone", "card");
 		assertThrows(IllegalArgumentException.class, () -> service.updateOrderStatus(order, "unknown"));
 	}
 
 	@Test
+	/* @brief Discount creation validates inputs
+	 * @tests Ensures manager/item/percentage/date range are validated. */
 	void createDiscountRejectsInvalidInputs() {
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
 		Timestamp start = Timestamp.valueOf("2025-01-01 00:00:00");
@@ -174,6 +208,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Detects overlapping discount periods
+	 * @tests Verifies new discount overlaps cause IllegalArgumentException. */
 	void createDiscountDetectsOverlap() {
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
 		Timestamp existingStart = Timestamp.valueOf("2025-01-01 00:00:00");
@@ -188,6 +224,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Successful discount creation appends to item
+	 * @tests Confirms item gains discount and DB layer is invoked. */
 	void createDiscountAppendsOnSuccess() {
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
 		Timestamp start = Timestamp.valueOf("2025-01-01 00:00:00");
@@ -200,6 +238,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Discount DB failure propagates
+	 * @tests Ensures RuntimeException when DB createDiscount returns false. */
 	void createDiscountPropagatesDbFailure() {
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
 		Timestamp start = Timestamp.valueOf("2025-01-01 00:00:00");
@@ -210,6 +250,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Monthly report returns DB content
+	 * @tests Verifies generateMonthlyReport delegates and returns stubbed string. */
 	void generateMonthlyReportReturnsDbResult() {
 		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
 		Date date = Date.valueOf("2025-02-01");
@@ -222,6 +264,8 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Monthly report rejects null inputs
+	 * @tests Validates manager/restaurant/date cannot be null. */
 	void generateMonthlyReportRejectsNulls() {
 		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
 		Date date = Date.valueOf("2025-02-01");

@@ -1,3 +1,7 @@
+/**
+ * This test class is written by Mohamed Khaled Becetti
+ */
+
 package FOS_TEST.CORE_TESTS;
 
 import FOS_CORE.Address;
@@ -13,7 +17,7 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// Basic unit tests for the Customer domain model
+
 public class CustomerTest {
 
 	private Customer customer;
@@ -21,7 +25,7 @@ public class CustomerTest {
 	@BeforeEach
 	void setUp() {
 		customer = new Customer();
-		// Initialize collections so behavior can be tested without hitting the DB-backed constructor
+		
 		setField(customer, "phoneNumbers", new ArrayList<String>());
 		setField(customer, "addresses", new ArrayList<Address>());
 		setField(customer, "orders", new ArrayList<Order>());
@@ -30,7 +34,9 @@ public class CustomerTest {
 	}
 
 	@Test
-	void userPropertiesAreReadableAndWritable() {
+	/* @brief Verifies base user attributes setters/getters
+	 * @tests Ensures id/email/passwordHash are writable and readable consistently. */
+	void attributesAreReadableAndWritable() {
 		customer.setUserID(42);
 		customer.setEmail("alice@example.com");
 		customer.setPasswordHash("hashed-password");
@@ -41,6 +47,8 @@ public class CustomerTest {
 	}
 
 	@Test
+	/* @brief Adding a phone number updates the list
+	 * @tests Confirms addPhoneNumber() appends and list reflects new value. */
 	void addPhoneNumberAppendsToList() {
 		customer.addPhoneNumber("555-1234");
 
@@ -49,6 +57,8 @@ public class CustomerTest {
 	}
 
 	@Test
+	/* @brief Injected collections are exposed by getters
+	 * @tests Validates getPhoneNumbers/getAddresses/getOrders/getCards/getCart return injected instances. */
 	void gettersExposeInjectedCollections() {
 		ArrayList<String> phones = new ArrayList<>();
 		ArrayList<Address> addresses = new ArrayList<>();
