@@ -458,5 +458,6 @@ public class ManagerServiceTest {
 			lastPassedDate = date;
 			return monthlyReport;
 		}
+
 	}
 }
