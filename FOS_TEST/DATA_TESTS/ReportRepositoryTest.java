@@ -1,71 +1,66 @@
 package FOS_TEST.DATA_TESTS;
 
+import FOS_CORE.Order;
 import FOS_CORE.Restaurant;
 import FOS_DATA.RestaurantData;
-import FOS_CORE.MenuItem;
-import FOS_CORE.Order;
-import FOS_CORE.Discount;
-
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ReportRepositoryTest {
 
-    private final RestaurantData restaurantData = new RestaurantData();
+    private RestaurantData restaurantData;
+    private Restaurant testRestaurant;
+    private Restaurant nonExistentRestaurant;
 
-    @Test
-    public void testFetchRestaurantsByCity() {
-        ArrayList<Restaurant> restaurants = restaurantData.fetchRestaurantsByCity("İstanbul");
-
-        Assertions.assertNotNull(restaurants);
-        Assertions.assertTrue(restaurants.size() > 0);
+    @BeforeEach
+    void setUp()
+    {
+        restaurantData = new RestaurantData();
+        // Using existing Restaurant ID 1 (Pizza Palace)
+        testRestaurant = new Restaurant(1, "Pizza Palace", "Italian", "İstanbul");
+        nonExistentRestaurant = new Restaurant(999, "Ghost Eatery", "Unknown", "Unknown");
     }
 
     @Test
-    public void testFetchRestaurantMenu() {
-        Restaurant r = new Restaurant(1, "Pizza Palace", "Italian", "İstanbul");
-        ArrayList<MenuItem> menu = restaurantData.fetchRestaurantMenu(r);
+    void testFetchRestaurantOrdersForToday_NotNull()
+    {
+        ArrayList<Order> dailyReport = restaurantData.fetchRestaurantOrdersForToday(testRestaurant);
 
-        Assertions.assertNotNull(menu);
-        Assertions.assertTrue(menu.size() > 0);
+        assertNotNull(dailyReport, "Daily report list should not be null");
     }
 
     @Test
-    public void testFetchMenuItemDiscounts() {
-        MenuItem m = new MenuItem(1, "Margherita Pizza", "desc", 12.99);
-        ArrayList<Discount> discounts = restaurantData.fetchMenuItemDiscounts(m);
+    void testFetchRestaurantOrdersForToday_DateBoundary()
+    {
+        ArrayList<Order> dailyReport = restaurantData.fetchRestaurantOrdersForToday(testRestaurant);
+        if (!dailyReport.isEmpty()) {
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            Timestamp todayStart = new Timestamp(cal.getTimeInMillis());
 
-        Assertions.assertNotNull(discounts);
-        Assertions.assertTrue(discounts.size() >= 0);
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            Timestamp tomorrowStart = new Timestamp(cal.getTimeInMillis());
+
+            for (Order order : dailyReport) {
+                Timestamp orderDate = order.getCreationDate();
+                assertTrue(orderDate.compareTo(todayStart) >= 0, "Order date must be on or after today's start");
+                assertTrue(orderDate.compareTo(tomorrowStart) < 0, "Order date must be before tomorrow's start");
+            }
+        }
     }
 
     @Test
-    public void testCalculateRestaurantRating() {
-        Restaurant r = new Restaurant(1, "Pizza Palace", "Italian", "İstanbul");
-        double rating = restaurantData.calculateRestaurantRating(r);
-
-        Assertions.assertTrue(rating >= 0);
-    }
-
-    @Test
-    public void testFetchRestaurantKeywords() {
-        Restaurant r = new Restaurant(1, "Pizza Palace", "Italian", "İstanbul");
-
-        ArrayList<String> keywords = restaurantData.fetchRestaurantKeywords(r);
-
-        Assertions.assertNotNull(keywords);
-        Assertions.assertTrue(keywords.size() > 0);
-    }
-
-    @Test
-    public void testFetchRestaurantOrdersForToday() {
-        Restaurant r = new Restaurant(1, "Pizza Palace", "Italian", "İstanbul");
-
-        ArrayList<Order> orders = restaurantData.fetchRestaurantOrdersForToday(r);
-
-        Assertions.assertNotNull(orders);
-        Assertions.assertTrue(orders.size() >= 0);
+    void testFetchRestaurantOrdersForToday_NonExistentRestaurant()
+    {
+        assertThrows(RuntimeException.class, () -> {
+            restaurantData.fetchRestaurantOrdersForToday(nonExistentRestaurant);
+        }, "Fetching orders for non-existent restaurant should throw a RuntimeException if underlying DB connection fails");
     }
 }

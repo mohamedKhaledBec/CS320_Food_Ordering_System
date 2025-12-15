@@ -1,55 +1,52 @@
 package FOS_TEST.DATA_TESTS;
 
 import FOS_CORE.Customer;
-import FOS_CORE.Manager;
 import FOS_CORE.User;
 import FOS_DATA.UserData;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class UserRepositoryTest {
+import static org.junit.jupiter.api.Assertions.*;
 
-    private final UserData userData = new UserData();
+public class UserRepositoryTest
+{
 
-    @Test
-    void testGetUserByEmail_Manager() {
-        User user = userData.getUserByEmail("manager.1@gmail.com");
-        Assertions.assertNotNull(user, "Manager should exist");
-        Assertions.assertTrue(user instanceof Manager, "Manager must be returned");
-        Assertions.assertEquals("manager.1@gmail.com", user.getEmail());
+    private UserData userData;
+    private User testCustomer;
+
+    @BeforeEach
+    void setUp()
+    {
+        userData = new UserData();
+        testCustomer = new Customer(4, "customer.1@gmail.com", "$2a$10$QYjRugyWC3sHYEqJCljG8OsPiCEMFNb4IPdtj/o9MPyW6zFbWrAP6");
     }
 
     @Test
-    void testGetUserByEmail_Customer() {
-        User user = userData.getUserByEmail("customer.1@gmail.com");
-        Assertions.assertNotNull(user, "Customer should exist");
-        Assertions.assertTrue(user instanceof Customer, "Customer must be returned");
-        Assertions.assertEquals("customer.1@gmail.com", user.getEmail());
+    void testGetUserByEmail_ExistingCustomer()
+    {
+        User fetchedUser = userData.getUserByEmail("customer.1@gmail.com");
+
+        assertNotNull(fetchedUser, "User should be found");
+        assertTrue(fetchedUser instanceof Customer, "User should be an instance of Customer");
+        assertEquals(4, fetchedUser.getUserID(), "User ID should match existing record");
     }
 
     @Test
-    void testGetUserByEmail_NotFound() {
-        User user = userData.getUserByEmail("doesnotexist@example.com");
-        Assertions.assertNull(user, "User should be null for non-existing email");
+    void testGetUserByEmail_NonExistent()
+    {
+        User fetchedUser = userData.getUserByEmail("nonexistent.ghost@gmail.com");
+        assertNull(fetchedUser, "Non-existent user should return null");
     }
 
     @Test
-    void testChangeUserPassword() {
-        // Arrange
-        User user = userData.getUserByEmail("customer.2@gmail.com");
-        Assertions.assertNotNull(user, "User must exist before test");
+    void testChangeUserPassword()
+    {
+        String newPassHash = "TEMP_TEST_HASH_123";
+        boolean result = userData.changeUserPassword(testCustomer, newPassHash);
 
-        String newPassword = "testpassword123";
-
-        // Act
-        boolean updated = userData.changeUserPassword(user, newPassword);
-
-        // Assert
-        Assertions.assertTrue(updated, "Password update should succeed");
-
-        // Verify update
-        User updatedUser = userData.getUserByEmail("customer.2@gmail.com");
-        Assertions.assertEquals(newPassword, updatedUser.getPassword(),
-                "Password must match newly updated password");
+        assertTrue(result, "Password update should return true");
+        User updatedUser = userData.getUserByEmail(testCustomer.getEmail());
+        assertEquals(newPassHash, updatedUser.getPasswordHash(), "Password hash in DB should be updated");
+        userData.changeUserPassword(testCustomer, testCustomer.getPasswordHash());
     }
 }

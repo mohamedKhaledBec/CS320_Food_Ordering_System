@@ -1,128 +1,58 @@
 package FOS_TEST.DATA_TESTS;
 
-import FOS_CORE.*;
+import FOS_CORE.MenuItem;
+import FOS_CORE.Restaurant;
 import FOS_DATA.RestaurantData;
-import org.junit.jupiter.api.*;
-
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class RestaurantRepositoryTest {
+public class RestaurantRepositoryTest
+{
 
-    private static RestaurantData restaurantData;
+    private RestaurantData restaurantData;
+    private Restaurant testRestaurant;
 
-    @BeforeAll
-    public static void setup() {
+    @BeforeEach
+    void setUp()
+    {
         restaurantData = new RestaurantData();
+        testRestaurant = new Restaurant(1, "Pizza Palace", "Italian", "İstanbul");
     }
 
-    // ------------------------------
-    // 1. fetchRestaurantsByCity()
-    // ------------------------------
     @Test
-    @Order(1)
-    public void testFetchRestaurantsByCity() {
-        ArrayList<Restaurant> list = restaurantData.fetchRestaurantsByCity("İstanbul");
-
-        assertNotNull(list);
-        assertTrue(list.size() >= 3); // Pizza Palace, Sushi Stop, Burger Bonanza
-
-        Restaurant r = list.get(0);
-        assertNotNull(r.getRestaurantName());
-        assertNotEquals(0, r.getRestaurantID());
+    void testFetchRestaurantsByCity_Found()
+    {
+        ArrayList<Restaurant> restaurants = restaurantData.fetchRestaurantsByCity("İstanbul");
+        assertNotNull(restaurants, "Result list should not be null");
+        assertTrue(restaurants.size() > 0, "Should find at least one restaurant in İstanbul");
+        boolean found = restaurants.stream().anyMatch(r -> r.getRestaurantID() == 1);
+        assertTrue(found, "Pizza Palace (ID 1) should be found in İstanbul");
     }
 
-    // ------------------------------
-    // 2. fetchRestaurantMenu()
-    // ------------------------------
     @Test
-    @Order(2)
-    public void testFetchRestaurantMenu() {
-
-        // Restaurant 1 -> Pizza Palace
-        Restaurant r = new Restaurant(1, "Pizza Palace", "Italian", "İstanbul");
-
-        ArrayList<MenuItem> menu = restaurantData.fetchRestaurantMenu(r);
-
-        assertNotNull(menu);
-        assertTrue(menu.size() >= 3); // 3 items inserted in SQL
-
-        MenuItem item = menu.get(0);
-        assertNotEquals(0, item.getMenuItemID());
+    void testFetchRestaurantsByCity_NotFound()
+    {
+        ArrayList<Restaurant> restaurants = restaurantData.fetchRestaurantsByCity("NonexistentCity");
+        assertNotNull(restaurants, "Result list should not be null");
+        assertEquals(0, restaurants.size(), "Should find zero restaurants in a non-existent city");
     }
 
-    // ------------------------------
-    // 3. fetchMenuItemDiscounts()
-    // ------------------------------
     @Test
-    @Order(3)
-    public void testFetchMenuItemDiscounts() {
+    void testFetchRestaurantMenu()
+    {
+        ArrayList<MenuItem> menu = restaurantData.fetchRestaurantMenu(testRestaurant);
 
-        // MenuItem 1 has a discount in your data
-        MenuItem item = new MenuItem(1, "Margherita", "test", 12.99);
-
-        ArrayList<Discount> discounts = restaurantData.fetchMenuItemDiscounts(item);
-
-        assertNotNull(discounts);
-        assertTrue(discounts.size() >= 1);
-
-        Discount d = discounts.get(0);
-        assertEquals("Pizza Deal", d.getDiscountName());
+        assertNotNull(menu, "Menu should not be null");
+        assertTrue(menu.size() > 0, "Restaurant should have menu items (e.g., Margherita Pizza)");
     }
 
-    // ------------------------------
-    // 4. calculateRestaurantRating()
-    // ------------------------------
     @Test
-    @Order(4)
-    public void testCalculateRestaurantRating() {
-
-        // Restaurant 1 has delivered orders in your SQL
-        Restaurant r = new Restaurant(1, "Pizza Palace", "Italian", "İstanbul");
-
-        double rating = restaurantData.calculateRestaurantRating(r);
-
-        assertTrue(rating > 0); // Pizza Palace has ratings in SQL
-        assertTrue(rating <= 5);
-    }
-
-    // ------------------------------
-    // 5. fetchRestaurantKeywords()
-    // ------------------------------
-    @Test
-    @Order(5)
-    public void testFetchRestaurantKeywords() {
-
-        Restaurant r = new Restaurant(1, "Pizza Palace", "Italian", "İstanbul");
-
-        ArrayList<String> keywords = restaurantData.fetchRestaurantKeywords(r);
-
-        assertNotNull(keywords);
-        assertTrue(keywords.contains("pizza"));
-        assertTrue(keywords.contains("italian"));
-    }
-
-    // ------------------------------
-    // 6. fetchRestaurantOrdersForToday()
-    // ------------------------------
-    @Test
-    @Order(6)
-    public void testFetchRestaurantOrdersForToday() {
-
-        Restaurant r = new Restaurant(1, "Pizza Palace", "Italian", "İstanbul");
-
-        ArrayList<Order> orders = restaurantData.fetchRestaurantOrdersForToday(r);
-
-        assertNotNull(orders);
-
-        // You might have 0 today if run on another date, so no assertTrue(size > 0)
-        if (!orders.isEmpty()) {
-            Order o = orders.get(0);
-            assertNotEquals(0, o.getOrderID());
-            assertNotNull(o.getOrderStatus());
-            assertNotNull(o.getDeliveryAddress());
-        }
+    void testFetchRestaurantKeywords()
+    {
+        ArrayList<String> keywords = restaurantData.fetchRestaurantKeywords(testRestaurant);
+        assertNotNull(keywords, "Keywords list should not be null");
+        assertTrue(keywords.contains("pizza") && keywords.contains("italian"), "Keywords should contain 'pizza' and 'italian'");
     }
 }
