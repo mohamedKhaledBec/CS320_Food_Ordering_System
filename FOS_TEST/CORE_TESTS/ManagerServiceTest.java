@@ -166,6 +166,16 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Remove menu item rejects nulls
+	 * @tests Ensures null restaurant or item throws IllegalArgumentException. */
+	void removeMenuItemRejectsNulls() {
+		MenuItem item = newMenuItem("Burger", "desc", 9.5);
+		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
+		assertThrows(IllegalArgumentException.class, () -> service.removeMenuItem(null, item));
+		assertThrows(IllegalArgumentException.class, () -> service.removeMenuItem(r, null));
+	}
+
+	@Test
 	/* @brief Remove menu item failure bubbles up
 	 * @tests Confirms RuntimeException when DB remove fails. */
 	void removeMenuItemPropagatesDbFailure() {
@@ -185,11 +195,29 @@ public class ManagerServiceTest {
 	}
 
 	@Test
+	/* @brief Order status is case-insensitive
+	 * @tests Mixed-case input should still map to the correct enum value. */
+	void updateOrderStatusAcceptsMixedCase() {
+		Order order = new Order("addr", new ArrayList<>(), "rest", "phone", "card");
+		service.updateOrderStatus(order, "PrEpArInG");
+		assertEquals(OrderStatus.PREPARING, order.getStatus());
+	}
+
+	@Test
 	/* @brief Invalid order status rejected
 	 * @tests Validates IllegalArgumentException for unknown status string. */
 	void updateOrderStatusRejectsInvalidValue() {
 		Order order = new Order("addr", new ArrayList<>(), "rest", "phone", "card");
 		assertThrows(IllegalArgumentException.class, () -> service.updateOrderStatus(order, "unknown"));
+	}
+
+	@Test
+	/* @brief Null order or status rejected
+	 * @tests Ensures IllegalArgumentException on null order or null status. */
+	void updateOrderStatusRejectsNulls() {
+		assertThrows(IllegalArgumentException.class, () -> service.updateOrderStatus(null, "pending"));
+		Order order = new Order("addr", new ArrayList<>(), "rest", "phone", "card");
+		assertThrows(IllegalArgumentException.class, () -> service.updateOrderStatus(order, null));
 	}
 
 	@Test
@@ -221,6 +249,39 @@ public class ManagerServiceTest {
 
 		assertThrows(IllegalArgumentException.class,
 				() -> service.createDiscount(manager, item, "new", 5, newStart, newEnd));
+	}
+
+	@Test
+	/* @brief Boundary equality counts as overlap
+	 * @tests New discount starting at existing end (or ending at existing start) is rejected. */
+	void createDiscountBoundaryEqualityIsOverlap() {
+		MenuItem item = newMenuItem("Burger", "desc", 9.5);
+		Timestamp existingStart = Timestamp.valueOf("2025-01-01 00:00:00");
+		Timestamp existingEnd = Timestamp.valueOf("2025-01-10 00:00:00");
+		item.getDiscounts().add(new Discount(1, "d1", "", 10, existingStart, existingEnd));
+
+		Timestamp newStart = existingEnd; // equal boundary
+		Timestamp newEnd = Timestamp.valueOf("2025-01-12 00:00:00");
+		assertThrows(IllegalArgumentException.class,
+				() -> service.createDiscount(manager, item, "boundary", 5, newStart, newEnd));
+
+		Timestamp newStart2 = Timestamp.valueOf("2024-12-20 00:00:00");
+		Timestamp newEnd2 = existingStart; // equal boundary
+		assertThrows(IllegalArgumentException.class,
+				() -> service.createDiscount(manager, item, "boundary2", 5, newStart2, newEnd2));
+	}
+
+	@Test
+	/* @brief Exact same discount window is rejected
+	 * @tests New discount matching existing start/end triggers overlap rejection. */
+	void createDiscountExactWindowIsOverlap() {
+		MenuItem item = newMenuItem("Burger", "desc", 9.5);
+		Timestamp existingStart = Timestamp.valueOf("2025-01-01 00:00:00");
+		Timestamp existingEnd = Timestamp.valueOf("2025-01-10 00:00:00");
+		item.getDiscounts().add(new Discount(1, "d1", "", 10, existingStart, existingEnd));
+
+		assertThrows(IllegalArgumentException.class,
+				() -> service.createDiscount(manager, item, "dup", 5, existingStart, existingEnd));
 	}
 
 	@Test
@@ -261,6 +322,7 @@ public class ManagerServiceTest {
 
 		assertEquals("REPORT", report);
 		assertEquals(1, dbStub.generateMonthlyReportCalls);
+		assertEquals(date, dbStub.lastPassedDate);
 	}
 
 	@Test
@@ -353,6 +415,7 @@ public class ManagerServiceTest {
 		int removeMenuItemCalls = 0;
 		int createDiscountCalls = 0;
 		int generateMonthlyReportCalls = 0;
+		Date lastPassedDate = null;
 
 		@Override
 		public ArrayList<Restaurant> fetchManagerRestaurants(Manager manager) {
@@ -392,6 +455,7 @@ public class ManagerServiceTest {
 		@Override
 		public String generateMonthlyReport(Restaurant restaurant, Date date) {
 			generateMonthlyReportCalls++;
+			lastPassedDate = date;
 			return monthlyReport;
 		}
 	}
