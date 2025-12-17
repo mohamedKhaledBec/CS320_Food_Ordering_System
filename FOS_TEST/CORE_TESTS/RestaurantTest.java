@@ -201,15 +201,8 @@ public class RestaurantTest {
 
 
 	private Restaurant allocateRestaurant() {
-		try {
-			Field f = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
-			f.setAccessible(true);
-			sun.misc.Unsafe unsafe = (sun.misc.Unsafe) f.get(null);
-			return (Restaurant) unsafe.allocateInstance(Restaurant.class);
-		} catch (Exception e) {
-			fail("Unable to allocate Restaurant without constructor: " + e.getMessage());
-			return null;
-		}
+
+		return new Restaurant(0, "Temp", "Temp", "Temp");
 	}
 
 	private static void setField(Object target, String fieldName, Object value) {
