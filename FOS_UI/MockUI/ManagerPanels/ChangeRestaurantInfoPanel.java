@@ -13,12 +13,10 @@ public class ChangeRestaurantInfoPanel extends JPanel {
     private ManagerMainPanel mainPanel;
     private Restaurant currentRestaurant;
 
-    private JLabel idValueLabel;
     private JTextField nameField;
-    private JComboBox<String> cityField;
+    private JComboBox<String> cityDropdown;
     private JTextField cuisineField;
     private JButton saveButton;
-    private JButton refreshButton;
 
     public ChangeRestaurantInfoPanel(ManagerMainPanel mainPanel) {
         this.mainPanel = mainPanel;
@@ -41,35 +39,23 @@ public class ChangeRestaurantInfoPanel extends JPanel {
         topPanel.add(backButton);
         add(topPanel, BorderLayout.NORTH);
 
-        JLabel idLabel = new JLabel("Restaurant ID:");
-        idValueLabel = new JLabel("-");
-
         JLabel nameLabel = new JLabel("Name:");
         nameField = new JTextField(20);
 
         JLabel cityLabel = new JLabel("City:");
-        cityField = new JComboBox<>(getTurkishCities());
+        cityDropdown = new JComboBox<>(getTurkishCities());
 
         JLabel cuisineLabel = new JLabel("Cuisine Type:");
         cuisineField = new JTextField(20);
 
         saveButton = new JButton("Save");
-        refreshButton = new JButton("Refresh");
 
         saveButton.addActionListener(e -> handleSave());
-        refreshButton.addActionListener(e -> loadRestaurantDetails());
 
         JPanel formPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        formPanel.add(idLabel, gbc);
-
-        gbc.gridx = 1;
-        formPanel.add(idValueLabel, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -83,7 +69,7 @@ public class ChangeRestaurantInfoPanel extends JPanel {
         formPanel.add(cityLabel, gbc);
 
         gbc.gridx = 1;
-        formPanel.add(cityField, gbc);
+        formPanel.add(cityDropdown, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 3;
@@ -92,8 +78,7 @@ public class ChangeRestaurantInfoPanel extends JPanel {
         gbc.gridx = 1;
         formPanel.add(cuisineField, gbc);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.add(refreshButton);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(saveButton);
 
         JPanel centerPanel = new JPanel(new BorderLayout());
@@ -109,9 +94,8 @@ public class ChangeRestaurantInfoPanel extends JPanel {
             return;
         }
 
-        idValueLabel.setText(String.valueOf(currentRestaurant.getRestaurantID()));
         nameField.setText(currentRestaurant.getRestaurantName());
-        cityField.setSelectedItem(currentRestaurant.getCity());
+        cityDropdown.setSelectedItem(currentRestaurant.getCity());
         cuisineField.setText(currentRestaurant.getCuisineType());
     }
 
@@ -122,7 +106,7 @@ public class ChangeRestaurantInfoPanel extends JPanel {
         }
 
         String name = nameField.getText().trim();
-        String city = cityField.getSelectedItem().toString();
+        String city = cityDropdown.getSelectedItem().toString();
         String cuisine = cuisineField.getText().trim();
 
         if (!InputValidator.isNonEmpty(name) ||
@@ -133,14 +117,15 @@ public class ChangeRestaurantInfoPanel extends JPanel {
             return;
         }
 
-        currentRestaurant.setRestaurantName(name);
-        currentRestaurant.setCity(city);
-        currentRestaurant.setCuisineType(cuisine);
+        Restaurant newRestaurantInfo = new Restaurant(currentRestaurant.getRestaurantID(), name, cuisine,city);
 
         IManagerService managerService = ServiceContext.getManagerService();
 
         try {
-            managerService.updateRestaurantInfo(currentRestaurant);
+            managerService.updateRestaurantInfo(newRestaurantInfo);
+            currentRestaurant.setRestaurantName(name);
+            currentRestaurant.setCity(city);
+            currentRestaurant.setCuisineType(cuisine);
             DialogUtils.showInfo(this, "Restaurant profile updated successfully.");
         } catch (Exception ex) {
             ex.printStackTrace();

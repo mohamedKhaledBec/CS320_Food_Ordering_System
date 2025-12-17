@@ -5,14 +5,14 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class ManagerService extends UserData implements IManagerService {
-    public boolean saveRestaurantInfo(Restaurant restaurant) {
-        String sql = "INSERT INTO Restaurant (manager_id, name, cuisine_type, city) VALUES (?, ?, ?, ?)";
+    public boolean updateRestaurantInfo(Restaurant newRestaurantInfo) {
+        String sql = "UPDATE Restaurant SET name = ?, cuisine_type = ?, city = ? WHERE restaurant_id = ?";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, restaurant.getRestaurantID());
-            statement.setString(2, restaurant.getRestaurantName());
-            statement.setString(3, restaurant.getCuisineType());
-            statement.setString(4, restaurant.getCity());
+            statement.setString(1, newRestaurantInfo.getRestaurantName());
+            statement.setString(2, newRestaurantInfo.getCuisineType());
+            statement.setString(3, newRestaurantInfo.getCity());
+            statement.setInt(4, newRestaurantInfo.getRestaurantID());
             int rowsAffected = statement.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
@@ -246,5 +246,33 @@ public class ManagerService extends UserData implements IManagerService {
         return report.toString();
     }
 
+    @Override
+    public boolean removeDiscount(Discount discount) {
+        final String sql = "DELETE FROM Discount WHERE discount_id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, discount.getDiscountID());
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Database failed to remove discount: " + e.getMessage());
+        }
+        return false;
+    }
+
+    @Override
+    public boolean updateOrderStatus(Order order, String status) {
+        final String sql = "UPDATE `Order` SET order_status = ? WHERE order_id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, status);
+            statement.setInt(2, order.getOrderID());
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Database failed to update order status: " + e.getMessage());
+        }
+        return false;
+    }
 }
 

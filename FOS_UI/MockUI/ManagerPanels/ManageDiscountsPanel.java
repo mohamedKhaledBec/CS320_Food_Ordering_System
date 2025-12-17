@@ -118,6 +118,7 @@ public class ManageDiscountsPanel extends JDialog {
             return;
         }
 
+        managerService.removeDiscount(discount);
         discounts.remove(discount);
         refreshDiscounts();
         DialogUtils.showInfo(this, "Discount deleted successfully.");

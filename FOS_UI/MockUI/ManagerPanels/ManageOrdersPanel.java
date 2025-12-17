@@ -86,21 +86,45 @@ public class ManageOrdersPanel extends JPanel {
         ));
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
 
-        JPanel infoPanel = new JPanel(new GridLayout(5, 1, 5, 5));
-        infoPanel.add(new JLabel("Order ID: " + order.getOrderID()));
-        infoPanel.add(new JLabel("Date: " + order.getCreationDate()));
-        infoPanel.add(new JLabel("Address: " + order.getDeliveryAddress()));
-        infoPanel.add(new JLabel("Phone: " + order.getPhoneNumber()));
+        JLabel orderIdLabel = new JLabel("Order #" + order.getOrderID());
+        orderIdLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
+        JLabel dateLabel = new JLabel("Date: " + order.getCreationDate());
+        JLabel restaurantLabel = new JLabel("Restaurant: " + order.getRestaurantName());
+        JLabel cardNumberLabel = new JLabel("Paid with Card: **** **** **** " + order.getCardNumber().substring(order.getCardNumber().length() - 4));
+        JLabel phoneLabel = new JLabel("Contact Phone: " + order.getPhoneNumber());
 
-        double total = 0;
+        JTextArea itemsArea = new JTextArea(3, 30);
+        itemsArea.setEditable(false);
+        StringBuilder itemsText = new StringBuilder();
+        float total = 0;
         for (CartItem item : order.getItems()) {
-            total += item.getPrice() * item.getQuantity();
+            itemsText.append(String.format("    %d %s                item price: %.2f \n",  item.getQuantity(), item.getMenuItem().getItemName(), item.getPrice()));
+            total += item.getQuantity() * item.getPrice();
         }
-        infoPanel.add(new JLabel(String.format("Total: $%.2f", total)));
+        itemsArea.setText(itemsText.toString());
+        JLabel totalPriceLabel = new JLabel("Total Price: " + String.format("%.2f", total));
 
-        card.add(infoPanel, BorderLayout.CENTER);
+        JPanel infoPanel = new JPanel(new GridLayout(-1, 1));
+        infoPanel.add(orderIdLabel);
+        infoPanel.add(dateLabel);
+        infoPanel.add(restaurantLabel);
+        infoPanel.add(totalPriceLabel);
+        infoPanel.add(cardNumberLabel);
+        infoPanel.add(phoneLabel);
 
-        JPanel statusPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel itemsPanel = new JPanel(new BorderLayout());
+        itemsPanel.add(new JLabel("Items:"), BorderLayout.NORTH);
+        itemsPanel.add(new JScrollPane(itemsArea), BorderLayout.CENTER);
+        JLabel ratingLabel = new JLabel();
+        if (order.getRating() == null && order.getStatus() == OrderStatus.DELIVERED) {
+            ratingLabel.setText("Order Not Yet Rated");
+        } else if (order.getRating() != null) {
+            ratingLabel.setText("Rating: " + order.getRating().getRatingValue() + "/5" +
+                    (order.getRating().getReviewText().isEmpty() ? "" : " - \"" + order.getRating().getReviewText() + "\""));
+        }
+        itemsPanel.add(ratingLabel, BorderLayout.SOUTH);
+
+        JPanel statusPanel = new JPanel(new GridLayout(5, 1));
         statusPanel.add(new JLabel("Status:"));
 
         JComboBox<OrderStatus> statusDropdown = new JComboBox<>(OrderStatus.values());
@@ -113,6 +137,8 @@ public class ManageOrdersPanel extends JPanel {
         });
 
         statusPanel.add(statusDropdown);
+        card.add(infoPanel, BorderLayout.WEST);
+        card.add(itemsPanel, BorderLayout.CENTER);
         card.add(statusPanel, BorderLayout.EAST);
 
         return card;
@@ -122,7 +148,6 @@ public class ManageOrdersPanel extends JPanel {
         try {
             IManagerService managerService = mainPanel.getManagerService();
             managerService.updateOrderStatus(order, newStatus.toString());
-            order.setStatus(newStatus);
             DialogUtils.showInfo(this, "Order status updated successfully.");
         } catch (Exception ex) {
             ex.printStackTrace();

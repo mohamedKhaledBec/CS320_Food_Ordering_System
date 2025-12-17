@@ -6,11 +6,12 @@ import java.sql.Date;
 
 public interface IManagerService {;
     ArrayList<Restaurant> getManagerRestaurants(Manager manager);
-    void updateRestaurantInfo(Restaurant restaurant);
+    void updateRestaurantInfo(Restaurant newRestaurantInfo);
     void addMenuItem(Restaurant restaurant, MenuItem item) ;
     void editMenuItem(Restaurant restaurant, MenuItem item);
     void removeMenuItem(Restaurant restaurant, MenuItem item);
     void updateOrderStatus(Order order, String status);
     String generateMonthlyReport(Manager manager, Restaurant restaurant, Date date);
     void createDiscount(Manager manager, MenuItem item, String description, double percentage, Timestamp startDate, Timestamp endDate);
+    void removeDiscount(Discount discount);
 }

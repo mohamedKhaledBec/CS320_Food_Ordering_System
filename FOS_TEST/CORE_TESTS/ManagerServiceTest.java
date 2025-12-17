@@ -61,8 +61,9 @@ public class ManagerServiceTest {
 	 * @tests Confirms updateRestaurantInfo() calls save twice (direct + internal). */
 	void updateRestaurantInfoValidSavesTwice() {
 		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
+		Restaurant newRestaurantInfo = newRestaurant(1, "New", "Cuisine", "City");
 
-		service.updateRestaurantInfo(r);
+		service.updateRestaurantInfo(newRestaurantInfo);
 
 		assertEquals(2, dbStub.saveRestaurantInfoCalls); // called directly + via saveRestaurantChanges
 	}
@@ -78,17 +79,17 @@ public class ManagerServiceTest {
 	/* @brief Empty restaurant name is rejected
 	 * @tests Ensures trimmed-empty names cause IllegalArgumentException. */
 	void updateRestaurantInfoRejectsEmptyName() {
-		Restaurant r = newRestaurant(1, " ", "Cuisine", "City");
-		assertThrows(IllegalArgumentException.class, () -> service.updateRestaurantInfo(r));
+		Restaurant newRestaurantInfo = newRestaurant(1, "", "Cuisine", "City");
+		assertThrows(IllegalArgumentException.class, () -> service.updateRestaurantInfo(newRestaurantInfo));
 	}
 
 	@Test
 	/* @brief Propagates DB failure on save
 	 * @tests Confirms updateRestaurantInfo() throws when DB returns false. */
 	void updateRestaurantInfoFailsWhenDbReturnsFalse() {
-		Restaurant r = newRestaurant(1, "Valid", "Cuisine", "City");
+		Restaurant newRestaurantInfo = newRestaurant(1, "Valid", "Cuisine", "City");
 		dbStub.saveRestaurantInfoResult = false;
-		assertThrows(RuntimeException.class, () -> service.updateRestaurantInfo(r));
+		assertThrows(RuntimeException.class, () -> service.updateRestaurantInfo(newRestaurantInfo));
 	}
 
 	@Test
@@ -423,7 +424,7 @@ public class ManagerServiceTest {
 		}
 
 		@Override
-		public boolean saveRestaurantInfo(Restaurant restaurant) {
+		public boolean updateRestaurantInfo(Restaurant newRestaurantInfo) {
 			saveRestaurantInfoCalls++;
 			return saveRestaurantInfoResult;
 		}

@@ -17,16 +17,13 @@ public class ManagerService implements IManagerService {
     }
 
     @Override
-    public void updateRestaurantInfo(Restaurant restaurant) {
-        if (restaurant == null) {
-            throw new IllegalArgumentException("Restaurant details must not be null");
+    public void updateRestaurantInfo(Restaurant newRestaurantInfo) {
+        if(newRestaurantInfo == null){
+            throw new IllegalArgumentException("Restaurant info must not be null");
         }
-        if (restaurant.getRestaurantName() == null || restaurant.getRestaurantName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Restaurant name is required");
+        if(!DB.updateRestaurantInfo(newRestaurantInfo)){
+            throw new RuntimeException("Failed to update restaurant info");
         }
-        boolean ok = DB.saveRestaurantInfo(restaurant);
-        if (!ok) throw new RuntimeException("Failed to save restaurant info");
-        saveRestaurantChanges(restaurant);
     }
 
     @Override
@@ -63,11 +60,10 @@ public class ManagerService implements IManagerService {
         if (order == null || status == null) {
             throw new IllegalArgumentException("Order and status must not be null");
         }
-        try {
-            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
-            order.setStatus(orderStatus);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid order status: " + status);
+        if (DB.updateOrderStatus(order, status)) {
+            order.setStatus(OrderStatus.valueOf(status));
+        }else {
+            throw new RuntimeException("Failed to update order status");
         }
     }
 
@@ -77,6 +73,12 @@ public class ManagerService implements IManagerService {
             throw new IllegalArgumentException("Manager, restaurant, and date must not be null");
         }
         return DB.generateMonthlyReport(restaurant, date);
+    }
+    @Override
+    public void removeDiscount(Discount discount) {
+        if(!DB.removeDiscount(discount)){
+            throw new RuntimeException("Failed to remove discount");
+        }
     }
 
     @Override
@@ -117,10 +119,5 @@ public class ManagerService implements IManagerService {
         if (item.getPrice() < 0) {
             throw new IllegalArgumentException("Menu item price cannot be negative");
         }
-    }
-
-    private void saveRestaurantChanges(Restaurant restaurant) {
-        if (restaurant == null) return;
-        DB.saveRestaurantInfo(restaurant);
     }
 }

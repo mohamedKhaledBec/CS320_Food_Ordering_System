@@ -106,6 +106,7 @@ public class EditMenuPanel extends JPanel {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton editButton = new JButton("Edit");
+        editButton.setBackground(Color.yellow);
         editButton.addActionListener(e -> editButtonAction(item));
         
         JButton removeButton = new JButton("Remove");

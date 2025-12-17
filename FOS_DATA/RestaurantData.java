@@ -119,15 +119,13 @@ public class RestaurantData implements IRestaurantData {
     public ArrayList<Order> fetchRestaurantOrdersForToday(Restaurant restaurant) {
         int restaurantId = restaurant.getRestaurantID();
         ArrayList<Order> orders = new ArrayList<>();
-        String sql = "SELECT o.order_id, o.order_date, o.order_status, o.phone_number, o.card_no, a.address_id," +
+        String sql = "SELECT o.order_id, o.order_date, o.order_status, o.phone_number, o.card_no, o.delivery_address_id," +
                 "                       rt.rating_value, rt.rating_comment\n" +
-                "                FROM Order o\n" +
-                "                JOIN Restaurant r ON o.restaurant_id = r.restaurant_id\n" +
-                "                JOIN Address a ON o.delivery_address_id = a.address_id\n" +
+                "                FROM `Order` o\n" +
                 "                LEFT JOIN Rating rt ON o.order_id = rt.order_id\n" +
-                "                WHERE o.restaurant_id = ?\n and order_date BETWEEN CURDATE() AND CURDATE() + INTERVAL 1 DAY" +
-                "                GROUP BY o.order_id, o.order_date, o.order_status, r.name, rt.rating_value, rt.rating_comment\n" +
-                "                ORDER BY o.order_date DESC";
+                "                WHERE o.restaurant_id = ? and order_date BETWEEN CURDATE() AND CURDATE() + INTERVAL 1 DAY" +
+                "                GROUP BY o.order_id, o.order_date, o.order_status, rt.rating_value, rt.rating_comment " +
+                "                ORDER BY o.order_status DESC, o.order_date DESC";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, restaurantId);
@@ -135,11 +133,11 @@ public class RestaurantData implements IRestaurantData {
                 while (resultSet.next()) {
                     int order_id = resultSet.getInt("order_id");
                     Timestamp date = resultSet.getTimestamp("order_date");
-                    OrderStatus status = OrderStatus.valueOf(resultSet.getString("status"));
+                    OrderStatus status = OrderStatus.valueOf(resultSet.getString("order_status").toUpperCase() );
                     int ratingValue = resultSet.getInt("rating_value");
                     String ratingComment = resultSet.getString("rating_comment");
-                    Rating rating = new Rating(ratingValue, ratingComment);
-                    int addressId = resultSet.getInt("address_id");
+                    Rating rating = (ratingValue == 0 && ratingComment == null)? null : new Rating(ratingValue, ratingComment);
+                    int addressId = resultSet.getInt("delivery_address_id");
                     String phoneNumber = resultSet.getString("phone_number");
                     String cardNo = resultSet.getString("card_no");
                     String deliveryAddress = fetchAddressDetails(addressId);
@@ -148,7 +146,7 @@ public class RestaurantData implements IRestaurantData {
                     orders.add(new Order(deliveryAddress, items, date, status, restaurantName, order_id, rating, phoneNumber, cardNo));
                 }
             } catch (SQLException e) {
-                System.out.println("Database failed to fetch Restaurant orders");
+                System.out.println("Database failed to fetch Restaurant orders" + e.getMessage());
             }
             return orders;
         } catch (SQLException e) {
@@ -179,7 +177,7 @@ public class RestaurantData implements IRestaurantData {
 
     private ArrayList<CartItem> fetchOrderItemsByOrderID(int orderID) {
         ArrayList<CartItem> items = new ArrayList<>();
-        final String sql = "SELECT mi.menu_item_id, mi.item_name, mi.description, mi.price, ci.quantity, ci.price as cart_price " +
+        final String sql = "SELECT mi.menu_item_id, mi.item_name, mi.description, mi.price, ci.quantity , ci.price as cart_price " +
                 "FROM CartItem ci " +
                 "JOIN MenuItem mi ON ci.menu_item_id = mi.menu_item_id " +
                 "WHERE ci.order_id = ?";

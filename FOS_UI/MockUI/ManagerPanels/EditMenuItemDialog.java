@@ -6,6 +6,7 @@ import FOS_UI.DialogUtils;
 import FOS_UI.InputValidator;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class EditMenuItemDialog extends JDialog {
     private MenuItem menuItem;
@@ -58,15 +59,18 @@ public class EditMenuItemDialog extends JDialog {
         add(new JScrollPane(descriptionArea));
         add(Box.createVerticalStrut(10));
 
+        JPanel buttonsSection = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
         JButton saveButton = new JButton("Add Menu Item");
         saveButton.addActionListener(e -> onSave());
         if(menuItem != null){
             saveButton.setText("Update Menu Item");
             JButton manageDiscountsButton = new JButton("Manage Discounts");
             manageDiscountsButton.addActionListener(e -> onManageDiscounts());
-            add(manageDiscountsButton);
+            buttonsSection.add(manageDiscountsButton);
         }
-        add(saveButton);
+        buttonsSection.add(saveButton);
+        add(buttonsSection);
     }
 
     private void onSave() {
