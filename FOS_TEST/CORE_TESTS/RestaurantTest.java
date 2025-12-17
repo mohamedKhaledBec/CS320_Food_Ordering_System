@@ -1,3 +1,7 @@
+/**
+ * This test class is written by Mohamed Khaled Becetti
+ */
+
 package FOS_TEST.CORE_TESTS;
 
 import FOS_CORE.MenuItem;
