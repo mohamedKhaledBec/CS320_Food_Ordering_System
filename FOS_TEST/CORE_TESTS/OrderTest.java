@@ -16,13 +16,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class OrderTest {
     private Order order;
-    private ArrayList<CartItem> items;
 
- 
+
     @BeforeEach
     public void setUp() throws Exception {
-        
-        items = new ArrayList<>();
+
+        ArrayList<CartItem> items = new ArrayList<>();
         order = new Order("123 Main St", items, "Test Restaurant", "555-1234", "4111111111111111");
 
         setField(order, "items", new ArrayList<>());
@@ -114,7 +113,7 @@ public class OrderTest {
 
     /**
      * @brief Test setStatus accepts null (no validation).
-     * @tests Validates current implementation allows null status (may be design bug).
+     * @tests Validates current implementation allows null status .
      */
     @Test
     public void testSetStatusAcceptsNull() {
@@ -482,7 +481,7 @@ public class OrderTest {
      * @tests Validates default status initialization in constructor.
      */
     @Test
-    public void testConstructorDefaultStatusPending() throws Exception {
+    public void testConstructorDefaultStatusPending()  {
         ArrayList<CartItem> constructorItems = new ArrayList<>();
         Order newOrder = new Order("123 Street", constructorItems, "Restaurant", "555-1111", "1234567890123456");
         assertEquals(OrderStatus.PENDING, newOrder.getStatus());
