@@ -12,6 +12,6 @@ public interface IManagerService {;
     void removeMenuItem(Restaurant restaurant, MenuItem item);
     void updateOrderStatus(Order order, String status);
     String generateMonthlyReport(Manager manager, Restaurant restaurant, Date date);
-    void createDiscount(Manager manager, MenuItem item, String description, double percentage, Timestamp startDate, Timestamp endDate);
+    void createDiscount(MenuItem item, String description, double percentage, Date startDate, Date endDate);
     void removeDiscount(Discount discount);
 }

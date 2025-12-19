@@ -2,14 +2,10 @@ package FOS_UI.MockUI.ManagerPanels;
 
 import FOS_CORE.*;
 import FOS_CORE.MenuItem;
-import FOS_UI.DialogUtils;
-import FOS_UI.ServiceContext;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class ManageDiscountsPanel extends JDialog {
     private MenuItem menuItem;
@@ -17,10 +13,10 @@ public class ManageDiscountsPanel extends JDialog {
     private JPanel discountsListPanel;
     private final IManagerService managerService;
 
-    public ManageDiscountsPanel(JDialog parent, MenuItem menuItem) {
+    public ManageDiscountsPanel(JDialog parent, MenuItem menuItem, IManagerService managerService) {
         super(parent, "Manage Discounts - " + menuItem.getItemName(), true);
         this.menuItem = menuItem;
-        this.managerService = ServiceContext.getManagerService();
+        this.managerService = managerService;
         this.discounts = menuItem.getDiscounts() != null ? menuItem.getDiscounts() : new ArrayList<>();
         initComponents();
         pack();
@@ -106,14 +102,13 @@ public class ManageDiscountsPanel extends JDialog {
 
         Discount newDiscount = dialog.getDiscount();
         if (newDiscount != null) {
-            discounts.add(newDiscount);
             refreshDiscounts();
-            DialogUtils.showInfo(this, "Discount added successfully.");
+            JOptionPane.showMessageDialog(this, "Discount added successfully.");
         }
     }
 
     private void deleteDiscount(Discount discount) {
-        int confirm = DialogUtils.confirm(this, "Are you sure you want to delete this discount?");
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this discount?");
         if (confirm != 0) {
             return;
         }
@@ -121,6 +116,6 @@ public class ManageDiscountsPanel extends JDialog {
         managerService.removeDiscount(discount);
         discounts.remove(discount);
         refreshDiscounts();
-        DialogUtils.showInfo(this, "Discount deleted successfully.");
+        JOptionPane.showMessageDialog(this, "Discount deleted successfully.");
     }
 }

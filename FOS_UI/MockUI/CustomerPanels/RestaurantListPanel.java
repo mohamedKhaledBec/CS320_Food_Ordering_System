@@ -49,6 +49,7 @@ public class RestaurantListPanel extends JPanel {
     }
 
     public void refresh() {
+        refreshAddressDropdown();
         restaurantPanel.removeAll();
         String city = extractCityFromAddress(selectedAddress);
         if (!city.isEmpty()) {
@@ -58,14 +59,23 @@ public class RestaurantListPanel extends JPanel {
         restaurantPanel.repaint();
     }
 
+    public void refreshAddressDropdown() {
+        cityDropdown.removeAllItems();
+        String[] addresses = getCustomerAddresses();
+        for (String address : addresses) {
+            cityDropdown.addItem(address);
+        }
+        if (cityDropdown.getItemCount() > 0 && cityDropdown.getItemAt(0) != null) {
+            selectedAddress = cityDropdown.getItemAt(0);
+        } else {
+            selectedAddress = null;
+        }
+    }
+
     private void searchByCity() {
         Object sel = cityDropdown.getSelectedItem();
         selectedAddress = (sel != null) ? sel.toString() : null;
         String city = extractCityFromAddress(selectedAddress);
-        if (city.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please select a valid city.", "Validation Error", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
         loadRestaurantsByCity(city);
     }
 

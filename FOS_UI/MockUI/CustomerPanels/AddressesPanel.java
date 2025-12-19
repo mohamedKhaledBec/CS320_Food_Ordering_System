@@ -89,6 +89,7 @@ public class AddressesPanel extends JPanel {
         if(added != null){
             refresh();
         }
+        mainPanel.getRestaurantListPanel().refresh();
     }
     private void removeButtonAction(Address address){
        Customer customer = mainPanel.getCurrentCustomer();
@@ -101,5 +102,6 @@ public class AddressesPanel extends JPanel {
        }
 
        refresh();
+       mainPanel.getRestaurantListPanel().refresh();
     }
 }

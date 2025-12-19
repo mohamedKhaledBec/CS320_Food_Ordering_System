@@ -4,7 +4,7 @@ import FOS_CORE.*;
 import FOS_DATA.ManagerService;
 import FOS_DATA.RestaurantData;
 import org.junit.jupiter.api.*;
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,8 +32,8 @@ public class DiscountRepositoryTest {
     @Test
     void testCreateDiscountSuccessfully() {
         // Create a discount with valid data
-        Timestamp startDate = new Timestamp(System.currentTimeMillis() - 86400000); // Yesterday
-        Timestamp endDate = new Timestamp(System.currentTimeMillis() + 86400000 * 30); // 30 days from now
+        Date startDate = new Date(System.currentTimeMillis() - 86400000); // Yesterday
+        Date endDate = new Date(System.currentTimeMillis() + 86400000 * 30); // 30 days from now
         
         Discount discount = new Discount();
         discount.setDiscountName("Test Discount");
@@ -51,8 +51,8 @@ public class DiscountRepositoryTest {
     @Test
     void testCreateDiscountWithInvalidPercentage() {
         // Create a discount with percentage > 100 (should fail database constraint)
-        Timestamp startDate = new Timestamp(System.currentTimeMillis() - 86400000);
-        Timestamp endDate = new Timestamp(System.currentTimeMillis() + 86400000 * 30);
+        Date startDate = new Date(System.currentTimeMillis() - 86400000);
+        Date endDate = new Date(System.currentTimeMillis() + 86400000 * 30);
         
         Discount discount = new Discount();
         discount.setDiscountName("Invalid Discount");
@@ -69,8 +69,8 @@ public class DiscountRepositoryTest {
     @Test
     void testCreateDiscountWithNegativePercentage() {
         // Create a discount with negative percentage (should fail database constraint)
-        Timestamp startDate = new Timestamp(System.currentTimeMillis() - 86400000);
-        Timestamp endDate = new Timestamp(System.currentTimeMillis() + 86400000 * 30);
+        Date startDate = new Date(System.currentTimeMillis() - 86400000);
+        Date endDate = new Date(System.currentTimeMillis() + 86400000 * 30);
         
         Discount discount = new Discount();
         discount.setDiscountName("Negative Discount");
@@ -96,7 +96,7 @@ public class DiscountRepositoryTest {
         assertTrue(discounts.size() >= 0, "Should return zero or more active discounts");
         
         // Verify all returned discounts are active
-        Timestamp now = new Timestamp(System.currentTimeMillis());
+        Date now = new Date(System.currentTimeMillis());
         for (Discount discount : discounts) {
             assertTrue(discount.getStartDate().before(now) || discount.getStartDate().equals(now),
                     "Discount start date should be before or equal to now");
@@ -110,10 +110,10 @@ public class DiscountRepositoryTest {
         // Create and fetch an expired discount
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, -30);
-        Timestamp startDate = new Timestamp(cal.getTimeInMillis());
+        Date startDate = new Date(cal.getTimeInMillis());
         
         cal.add(Calendar.DAY_OF_MONTH, -1);
-        Timestamp endDate = new Timestamp(cal.getTimeInMillis()); // Yesterday (expired)
+        Date endDate = new Date(cal.getTimeInMillis()); // Yesterday (expired)
         
         Discount expiredDiscount = new Discount();
         expiredDiscount.setDiscountName("Expired Discount");
@@ -144,10 +144,10 @@ public class DiscountRepositoryTest {
         // Create a discount that starts in the future
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, 1);
-        Timestamp startDate = new Timestamp(cal.getTimeInMillis()); // Tomorrow
+        Date startDate = new Date(cal.getTimeInMillis()); // Tomorrow
         
         cal.add(Calendar.DAY_OF_MONTH, 30);
-        Timestamp endDate = new Timestamp(cal.getTimeInMillis()); // 31 days from now
+        Date endDate = new Date(cal.getTimeInMillis()); // 31 days from now
         
         Discount futureDiscount = new Discount();
         futureDiscount.setDiscountName("Future Discount");
@@ -187,8 +187,8 @@ public class DiscountRepositoryTest {
     @Test
     void testDiscountPropertiesAfterCreation() {
         // Create a discount and verify all properties are set correctly
-        Timestamp startDate = new Timestamp(System.currentTimeMillis() - 86400000);
-        Timestamp endDate = new Timestamp(System.currentTimeMillis() + 86400000 * 30);
+        Date startDate = new Date(System.currentTimeMillis() - 86400000);
+        Date endDate = new Date(System.currentTimeMillis() + 86400000 * 30);
         
         String discountName = "Property Test Discount";
         String description = "Testing discount properties";
@@ -226,8 +226,8 @@ public class DiscountRepositoryTest {
     @Test
     void testMultipleDiscountsForMenuItem() {
         // Create multiple discounts for the same menu item
-        Timestamp startDate1 = new Timestamp(System.currentTimeMillis() - 86400000);
-        Timestamp endDate1 = new Timestamp(System.currentTimeMillis() + 86400000 * 10);
+        Date startDate1 = new Date(System.currentTimeMillis() - 86400000);
+        Date endDate1 = new Date(System.currentTimeMillis() + 86400000 * 10);
         
         Discount discount1 = new Discount();
         discount1.setDiscountName("First Discount");
@@ -236,8 +236,8 @@ public class DiscountRepositoryTest {
         discount1.setStartDate(startDate1);
         discount1.setEndDate(endDate1);
 
-        Timestamp startDate2 = new Timestamp(System.currentTimeMillis() - 86400000);
-        Timestamp endDate2 = new Timestamp(System.currentTimeMillis() + 86400000 * 20);
+        Date startDate2 = new Date(System.currentTimeMillis() - 86400000);
+        Date endDate2 = new Date(System.currentTimeMillis() + 86400000 * 20);
         
         Discount discount2 = new Discount();
         discount2.setDiscountName("Second Discount");

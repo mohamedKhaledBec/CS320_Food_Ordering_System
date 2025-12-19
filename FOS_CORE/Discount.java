@@ -8,10 +8,10 @@ public class Discount {
     private String DiscountName;
     private String description;
     private double discountPercentage;
-    private Timestamp startDate;
-    private Timestamp endDate;
+    private Date startDate;
+    private Date endDate;
     public Discount() { }
-    public Discount(int discountID, String discountName, String description, double discountPercentage, Timestamp startDate, Timestamp endDate) {
+    public Discount(int discountID, String discountName, String description, double discountPercentage, Date startDate, Date endDate) {
         this.discountID = discountID;
         this.DiscountName = discountName;
         this.description = description;
@@ -52,19 +52,19 @@ public class Discount {
         this.discountPercentage = discountPercentage;
     }
 
-    public Timestamp getStartDate() {
+    public Date getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Timestamp startDate) {
+    public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
-    public Timestamp getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Timestamp endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 }

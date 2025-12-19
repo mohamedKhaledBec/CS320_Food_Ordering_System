@@ -58,8 +58,8 @@ CREATE TABLE Discount (
     discount_name VARCHAR(50) NOT NULL,
     discount_description TEXT,
     discount_percentage DECIMAL(5,2) NOT NULL,
-    start_date timestamp NOT NULL,
-    end_date timestamp NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
     CONSTRAINT discount_percentage_chk CHECK (discount_percentage >= 0 AND discount_percentage <= 100),
     FOREIGN KEY (menu_item_id) REFERENCES MenuItem(menu_item_id) ON DELETE CASCADE
 );

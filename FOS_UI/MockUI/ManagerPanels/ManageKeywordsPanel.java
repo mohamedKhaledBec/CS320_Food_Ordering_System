@@ -1,7 +1,6 @@
 package FOS_UI.MockUI.ManagerPanels;
 
 import FOS_CORE.Restaurant;
-import FOS_UI.DialogUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -97,19 +96,19 @@ public class ManageKeywordsPanel extends JPanel {
         if (keyword != null && !keyword.trim().isEmpty()) {
             keyword = keyword.trim();
             if (keywords.contains(keyword)) {
-                DialogUtils.showError(this, "Keyword already exists.");
+            JOptionPane.showMessageDialog(this, "Keyword already exists.", "Error", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             keywords.add(keyword);
             restaurant.setKeywords(keywords);
             refresh();
-            DialogUtils.showInfo(this, "Keyword added successfully.");
+            JOptionPane.showMessageDialog(this, "Keyword added successfully.");
         }
     }
 
     private void deleteKeyword(String keyword) {
-        int confirm = DialogUtils.confirm(this, "Are you sure you want to delete this keyword?");
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this keyword?");
         if (confirm != 0) {
             return;
         }
@@ -117,6 +116,6 @@ public class ManageKeywordsPanel extends JPanel {
         keywords.remove(keyword);
         restaurant.setKeywords(keywords);
         refresh();
-        DialogUtils.showInfo(this, "Keyword deleted successfully.");
+        JOptionPane.showMessageDialog(this, "Keyword deleted successfully.");
     }
 }

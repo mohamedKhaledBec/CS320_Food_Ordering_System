@@ -73,17 +73,20 @@ public class ManagerService extends UserData implements IManagerService {
     public boolean createDiscount(Discount discount, MenuItem menuItem) {
         String sql = "INSERT INTO Discount (menu_item_id, discount_name, discount_description, discount_percentage, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, menuItem.getMenuItemID());
             statement.setString(2, discount.getDiscountName());
             statement.setString(3, discount.getDescription());
             statement.setDouble(4, discount.getDiscountPercentage());
-            statement.setTimestamp(5, new Timestamp(discount.getStartDate().getTime()));
-            statement.setTimestamp(6, new Timestamp(discount.getEndDate().getTime()));
+            statement.setDate(5, new Date(discount.getStartDate().getTime()));
+            statement.setDate(6, new Date(discount.getEndDate().getTime()));
             int rowsAffected = statement.executeUpdate();
-            sql = "SELECT LAST_INSERT_ID() AS discount_id";
-            ResultSet resultSet = statement.executeQuery(sql);
-            discount.setDiscountID(resultSet.getInt("discount_id"));
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            if (!generatedKeys.next()) {
+                System.out.println("Failed to retrieve generated discount ID");
+                return false;
+            }
+            discount.setDiscountID(generatedKeys.getInt(1));
             return rowsAffected > 0;
         } catch (SQLException e) {
             System.out.println("Database failed to create discount: " + e.getMessage());

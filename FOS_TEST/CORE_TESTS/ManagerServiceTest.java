@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Date;
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -226,14 +226,14 @@ public class ManagerServiceTest {
 	 * @tests Ensures manager/item/percentage/date range are validated. */
 	void createDiscountRejectsInvalidInputs() {
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
-		Timestamp start = Timestamp.valueOf("2025-01-01 00:00:00");
-		Timestamp end = Timestamp.valueOf("2025-01-02 00:00:00");
+		Date start = Date.valueOf("2025-01-01");
+		Date end = Date.valueOf("2025-01-02");
 
-		assertThrows(IllegalArgumentException.class, () -> service.createDiscount(null, item, "d", 10, start, end));
-		assertThrows(IllegalArgumentException.class, () -> service.createDiscount(manager, null, "d", 10, start, end));
-		assertThrows(IllegalArgumentException.class, () -> service.createDiscount(manager, item, "d", -1, start, end));
-		assertThrows(IllegalArgumentException.class, () -> service.createDiscount(manager, item, "d", 101, start, end));
-		assertThrows(IllegalArgumentException.class, () -> service.createDiscount(manager, item, "d", 10, end, start));
+		assertThrows(IllegalArgumentException.class, () -> service.createDiscount( item, "d", 10, start, end));
+		assertThrows(IllegalArgumentException.class, () -> service.createDiscount(null, "d", 10, start, end));
+		assertThrows(IllegalArgumentException.class, () -> service.createDiscount(item, "d", -1, start, end));
+		assertThrows(IllegalArgumentException.class, () -> service.createDiscount(item, "d", 101, start, end));
+		assertThrows(IllegalArgumentException.class, () -> service.createDiscount(item, "d", 10, end, start));
 	}
 
 	@Test
@@ -241,15 +241,15 @@ public class ManagerServiceTest {
 	 * @tests Verifies new discount overlaps cause IllegalArgumentException. */
 	void createDiscountDetectsOverlap() {
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
-		Timestamp existingStart = Timestamp.valueOf("2025-01-01 00:00:00");
-		Timestamp existingEnd = Timestamp.valueOf("2025-01-10 00:00:00");
+		Date existingStart = Date.valueOf("2025-01-01 00:00:00");
+		Date existingEnd = Date.valueOf("2025-01-10 00:00:00");
 		item.getDiscounts().add(new Discount(1, "d1", "", 10, existingStart, existingEnd));
 
-		Timestamp newStart = Timestamp.valueOf("2025-01-05 00:00:00");
-		Timestamp newEnd = Timestamp.valueOf("2025-01-06 00:00:00");
+		Date newStart = Date.valueOf("2025-01-05 00:00:00");
+		Date newEnd = Date.valueOf("2025-01-06 00:00:00");
 
 		assertThrows(IllegalArgumentException.class,
-				() -> service.createDiscount(manager, item, "new", 5, newStart, newEnd));
+				() -> service.createDiscount(item, "new", 5, newStart, newEnd));
 	}
 
 	@Test
@@ -257,19 +257,19 @@ public class ManagerServiceTest {
 	 * @tests New discount starting at existing end (or ending at existing start) is rejected. */
 	void createDiscountBoundaryEqualityIsOverlap() {
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
-		Timestamp existingStart = Timestamp.valueOf("2025-01-01 00:00:00");
-		Timestamp existingEnd = Timestamp.valueOf("2025-01-10 00:00:00");
+		Date existingStart = Date.valueOf("2025-01-01 00:00:00");
+		Date existingEnd = Date.valueOf("2025-01-10 00:00:00");
 		item.getDiscounts().add(new Discount(1, "d1", "", 10, existingStart, existingEnd));
 
-		Timestamp newStart = existingEnd; // equal boundary
-		Timestamp newEnd = Timestamp.valueOf("2025-01-12 00:00:00");
+		Date newStart = existingEnd; // equal boundary
+		Date newEnd = Date.valueOf("2025-01-12 00:00:00");
 		assertThrows(IllegalArgumentException.class,
-				() -> service.createDiscount(manager, item, "boundary", 5, newStart, newEnd));
+				() -> service.createDiscount(item, "boundary", 5, newStart, newEnd));
 
-		Timestamp newStart2 = Timestamp.valueOf("2024-12-20 00:00:00");
-		Timestamp newEnd2 = existingStart; // equal boundary
+		Date newStart2 = Date.valueOf("2024-12-20 00:00:00");
+		Date newEnd2 = existingStart; // equal boundary
 		assertThrows(IllegalArgumentException.class,
-				() -> service.createDiscount(manager, item, "boundary2", 5, newStart2, newEnd2));
+				() -> service.createDiscount(item, "boundary2", 5, newStart2, newEnd2));
 	}
 
 	@Test
@@ -277,12 +277,12 @@ public class ManagerServiceTest {
 	 * @tests New discount matching existing start/end triggers overlap rejection. */
 	void createDiscountExactWindowIsOverlap() {
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
-		Timestamp existingStart = Timestamp.valueOf("2025-01-01 00:00:00");
-		Timestamp existingEnd = Timestamp.valueOf("2025-01-10 00:00:00");
+		Date existingStart = Date.valueOf("2025-01-01 00:00:00");
+		Date existingEnd = Date.valueOf("2025-01-10 00:00:00");
 		item.getDiscounts().add(new Discount(1, "d1", "", 10, existingStart, existingEnd));
 
 		assertThrows(IllegalArgumentException.class,
-				() -> service.createDiscount(manager, item, "dup", 5, existingStart, existingEnd));
+				() -> service.createDiscount( item, "dup", 5, existingStart, existingEnd));
 	}
 
 	@Test
@@ -290,10 +290,10 @@ public class ManagerServiceTest {
 	 * @tests Confirms item gains discount and DB layer is invoked. */
 	void createDiscountAppendsOnSuccess() {
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
-		Timestamp start = Timestamp.valueOf("2025-01-01 00:00:00");
-		Timestamp end = Timestamp.valueOf("2025-01-02 00:00:00");
+		Date start = Date.valueOf("2025-01-01 00:00:00");
+		Date end = Date.valueOf("2025-01-02 00:00:00");
 
-		service.createDiscount(manager, item, "new", 5, start, end);
+		service.createDiscount(item, "new", 5, start, end);
 
 		assertEquals(1, item.getDiscounts().size());
 		assertEquals(1, dbStub.createDiscountCalls);
@@ -304,11 +304,11 @@ public class ManagerServiceTest {
 	 * @tests Ensures RuntimeException when DB createDiscount returns false. */
 	void createDiscountPropagatesDbFailure() {
 		MenuItem item = newMenuItem("Burger", "desc", 9.5);
-		Timestamp start = Timestamp.valueOf("2025-01-01 00:00:00");
-		Timestamp end = Timestamp.valueOf("2025-01-02 00:00:00");
+		Date start = Date.valueOf("2025-01-01 00:00:00");
+		Date end = Date.valueOf("2025-01-02 00:00:00");
 		dbStub.createDiscountResult = false;
 
-		assertThrows(RuntimeException.class, () -> service.createDiscount(manager, item, "new", 5, start, end));
+		assertThrows(RuntimeException.class, () -> service.createDiscount(item, "new", 5, start, end));
 	}
 
 	@Test

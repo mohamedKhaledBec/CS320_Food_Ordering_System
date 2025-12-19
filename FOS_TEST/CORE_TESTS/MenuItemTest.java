@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -47,8 +48,8 @@ public class MenuItemTest {
     void getDiscountsReturnsInjectedList() {
         ArrayList<Discount> discounts = new ArrayList<>();
         discounts.add(new Discount(1, "Summer Sale", "50% off", 50, 
-            Timestamp.valueOf("2025-06-01 00:00:00"), 
-            Timestamp.valueOf("2025-08-31 23:59:59")));
+            Date.valueOf("2025-06-01"),
+            Date.valueOf("2025-08-31")));
 
         setField(menuItem, "discounts", discounts);
 
@@ -62,8 +63,8 @@ public class MenuItemTest {
     void setDiscountsReplacesList() {
         ArrayList<Discount> newDiscounts = new ArrayList<>();
         newDiscounts.add(new Discount(2, "Winter Sale", "25% off", 25,
-            Timestamp.valueOf("2025-12-01 00:00:00"),
-            Timestamp.valueOf("2025-12-31 23:59:59")));
+            Date.valueOf("2025-12-01"),
+            Date.valueOf("2025-12-31")));
 
         menuItem.setDiscounts(newDiscounts);
 
@@ -135,11 +136,11 @@ public class MenuItemTest {
     void multipleDiscountsCanBeAdded() {
         ArrayList<Discount> discounts = new ArrayList<>();
         discounts.add(new Discount(1, "D1", "desc1", 10,
-            Timestamp.valueOf("2025-01-01 00:00:00"),
-            Timestamp.valueOf("2025-01-31 23:59:59")));
+            Date.valueOf("2025-01-01"),
+            Date.valueOf("2025-01-31")));
         discounts.add(new Discount(2, "D2", "desc2", 20,
-            Timestamp.valueOf("2025-02-01 00:00:00"),
-            Timestamp.valueOf("2025-02-28 23:59:59")));
+            Date.valueOf("2025-02-01"),
+            Date.valueOf("2025-02-28")));
 
         menuItem.setDiscounts(discounts);
 
@@ -155,8 +156,8 @@ public class MenuItemTest {
         assertSame(discounts, menuItem.getDiscounts());
 
         menuItem.getDiscounts().add(new Discount(3, "D3", "desc3", 5,
-                Timestamp.valueOf("2025-03-01 00:00:00"),
-                Timestamp.valueOf("2025-03-31 23:59:59")));
+                Date.valueOf("2025-03-01"),
+                Date.valueOf("2025-03-31")));
 
         assertEquals(1, menuItem.getDiscounts().size());
     }

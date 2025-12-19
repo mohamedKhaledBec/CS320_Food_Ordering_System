@@ -363,27 +363,6 @@ public class CustomerService extends UserData implements ICustomerService {
         }
         return items;
     }
-    private ArrayList<Discount> fetchDiscountsByMenuItemID(int menuItemID) {
-        ArrayList<Discount> discounts = new ArrayList<>();
-        final String sql = "SELECT discount_id, discount_name, discount_description, discount_percentage, start_date, end_date FROM Discount WHERE menu_item_id = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, menuItemID);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                int discountId = resultSet.getInt("discount_id");
-                String discountName = resultSet.getString("discount_name");
-                String discountDescription = resultSet.getString("discount_description");
-                double percentage = resultSet.getDouble("discount_percentage");
-                Timestamp startDate = resultSet.getTimestamp("start_date");
-                Timestamp endDate = resultSet.getTimestamp("end_date");
-                discounts.add(new Discount(discountId,discountName, discountDescription, percentage, startDate, endDate));
-            }
-        } catch (SQLException e) {
-            System.out.println("Database failed to fetch discounts: " + e.getMessage());
-        }
-        return discounts;
-    }
     private boolean addPhoneNumberToCustomerOnLogin(Connection connection, Customer customer, String phoneNumber) {
         int customerId = customer.getUserID();
         final String sql = "INSERT INTO Phone (customer_id, phone_number) VALUES (?, ?)";

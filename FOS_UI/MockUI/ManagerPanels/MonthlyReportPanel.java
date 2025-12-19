@@ -1,10 +1,6 @@
 package FOS_UI.MockUI.ManagerPanels;
 
-import FOS_CORE.IManagerService;
-import FOS_CORE.Manager;
-import FOS_CORE.Restaurant;
-import FOS_UI.DialogUtils;
-import FOS_UI.ServiceContext;
+import FOS_CORE.*;
 import com.toedter.calendar.*;
 import javax.swing.*;
 import java.awt.*;
@@ -65,15 +61,15 @@ public class MonthlyReportPanel extends JPanel {
     private void onGenerateReport() {
         Manager manager = mainPanel.getCurrentManager();
         if (manager == null) {
-            DialogUtils.showError(this, "Only managers can view monthly reports.");
+            JOptionPane.showMessageDialog(this, "You are not logged in as a manager.");
             return;
         }
 
         try {
-            IManagerService ms = ServiceContext.getManagerService();
+            IManagerService ms = mainPanel.getManagerService();
 
             if (restaurant == null) {
-                DialogUtils.showError(this, "Restaurant not found.");
+                JOptionPane.showMessageDialog(this, "Restaurant information is missing.");
                 return;
             }
 
@@ -97,7 +93,7 @@ public class MonthlyReportPanel extends JPanel {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            DialogUtils.showError(this, "Failed to generate monthly report.");
+            JOptionPane.showMessageDialog(this, "Failed to generate report: " + ex.getMessage());
         }
     }
 }

@@ -82,10 +82,7 @@ public class ManagerService implements IManagerService {
     }
 
     @Override
-    public void createDiscount(Manager manager, MenuItem item, String description, double percentage, Timestamp startDate, Timestamp endDate) {
-        if (manager == null || item == null) {
-            throw new IllegalArgumentException("Manager and menu item must not be null");
-        }
+    public void createDiscount(MenuItem item, String description, double percentage, Date startDate, Date endDate) {
         if (startDate == null || endDate == null || endDate.before(startDate)) {
             throw new IllegalArgumentException("Invalid date range for discount");
         }
@@ -96,8 +93,8 @@ public class ManagerService implements IManagerService {
         // Ensure no overlapping discounts for this menu item
         for (Discount existing : item.getDiscounts()) {
             if (existing == null) continue;
-            Timestamp exStart = existing.getStartDate();
-            Timestamp exEnd = existing.getEndDate();
+            Date exStart = existing.getStartDate();
+            Date exEnd = existing.getEndDate();
             if (exStart == null || exEnd == null) continue;
             // overlap if newStart <= exEnd && newEnd >= exStart
             if (!endDate.before(exStart) && !startDate.after(exEnd)) {

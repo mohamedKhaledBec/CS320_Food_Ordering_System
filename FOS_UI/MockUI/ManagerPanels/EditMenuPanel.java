@@ -4,8 +4,6 @@ import FOS_CORE.IManagerService;
 import FOS_CORE.IRestaurantService;
 import FOS_CORE.MenuItem;
 import FOS_CORE.Restaurant;
-import FOS_UI.DialogUtils;
-import FOS_UI.ServiceContext;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,8 +21,8 @@ public class EditMenuPanel extends JPanel {
 
     public EditMenuPanel(ManagerMainPanel mainPanel) {
         this.mainPanel = mainPanel;
-        this.restaurantService = ServiceContext.getRestaurantService();
-        this.managerService = ServiceContext.getManagerService();
+        this.restaurantService = mainPanel.getRestaurantService();
+        this.managerService = mainPanel.getManagerService();
         initComponents();
     }
 
@@ -70,7 +68,7 @@ public class EditMenuPanel extends JPanel {
             refresh();
         } catch (Exception ex) {
             ex.printStackTrace();
-            DialogUtils.showError(this, "Failed to load menu: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Failed to load menu items: " + ex.getMessage());
         }
     }
 
@@ -132,10 +130,10 @@ public class EditMenuPanel extends JPanel {
                 managerService.addMenuItem(restaurant, added);
                 menuItems.add(added);
                 refresh();
-                DialogUtils.showInfo(this, "Menu item added successfully.");
+                JOptionPane.showMessageDialog(this, "Menu item added successfully.");
             } catch (Exception ex) {
                 ex.printStackTrace();
-                DialogUtils.showError(this, "Failed to add menu item: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Failed to add menu item: " + ex.getMessage());
             }
         }
     }
@@ -153,16 +151,16 @@ public class EditMenuPanel extends JPanel {
                 
                 managerService.editMenuItem(restaurant, item);
                 refresh();
-                DialogUtils.showInfo(this, "Menu item updated successfully.");
+               JOptionPane.showMessageDialog(this, "Menu item updated successfully.");
             } catch (Exception ex) {
                 ex.printStackTrace();
-                DialogUtils.showError(this, "Failed to update menu item: " + ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Failed to update menu item: " + ex.getMessage());
             }
         }
     }
 
     private void removeButtonAction(MenuItem item) {
-        if (DialogUtils.confirm(this, "Are you sure you want to delete this menu item?") == 1) {
+        if (JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this menu item?") == 1) {
             return;
         }
 
@@ -170,10 +168,10 @@ public class EditMenuPanel extends JPanel {
             managerService.removeMenuItem(restaurant, item);
             menuItems.remove(item);
             refresh();
-            DialogUtils.showInfo(this, "Menu item deleted successfully.");
+            JOptionPane.showMessageDialog(this, "Menu item deleted successfully.");
         } catch (Exception ex) {
             ex.printStackTrace();
-            DialogUtils.showError(this, "Failed to delete menu item: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Failed to delete menu item: " + ex.getMessage());
         }
     }
 }

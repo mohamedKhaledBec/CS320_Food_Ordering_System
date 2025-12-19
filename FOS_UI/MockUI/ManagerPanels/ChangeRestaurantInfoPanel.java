@@ -2,9 +2,6 @@ package FOS_UI.MockUI.ManagerPanels;
 
 import FOS_CORE.IManagerService;
 import FOS_CORE.Restaurant;
-import FOS_UI.DialogUtils;
-import FOS_UI.InputValidator;
-import FOS_UI.ServiceContext;
 
 import javax.swing.*;
 import java.awt.*;
@@ -101,7 +98,7 @@ public class ChangeRestaurantInfoPanel extends JPanel {
 
     private void handleSave() {
         if (currentRestaurant == null) {
-            DialogUtils.showError(this, "No restaurant loaded to update.");
+            JOptionPane.showMessageDialog(this, "Please select a restaurant.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -109,27 +106,27 @@ public class ChangeRestaurantInfoPanel extends JPanel {
         String city = cityDropdown.getSelectedItem().toString();
         String cuisine = cuisineField.getText().trim();
 
-        if (!InputValidator.isNonEmpty(name) ||
-                !InputValidator.isNonEmpty(city) ||
-                !InputValidator.isNonEmpty(cuisine)) {
+        if (!name.isEmpty() ||
+                !city.isEmpty() ||
+                !cuisine.isEmpty()) {
 
-            DialogUtils.showError(this, "Please fill in all fields.");
+            JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         Restaurant newRestaurantInfo = new Restaurant(currentRestaurant.getRestaurantID(), name, cuisine,city);
 
-        IManagerService managerService = ServiceContext.getManagerService();
+        IManagerService managerService = mainPanel.getManagerService();
 
         try {
             managerService.updateRestaurantInfo(newRestaurantInfo);
             currentRestaurant.setRestaurantName(name);
             currentRestaurant.setCity(city);
             currentRestaurant.setCuisineType(cuisine);
-            DialogUtils.showInfo(this, "Restaurant profile updated successfully.");
+            JOptionPane.showMessageDialog(this, "Restaurant profile updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception ex) {
             ex.printStackTrace();
-            DialogUtils.showError(this, "Failed to update restaurant profile: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Failed to update restaurant profile: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

@@ -5,7 +5,7 @@ import FOS_DATA.IRestaurantData;
 import FOS_DATA.ManagerService;
 import FOS_DATA.RestaurantData;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.ArrayList;
 
 public class RestaurantService implements IRestaurantService {
@@ -52,8 +52,8 @@ public class RestaurantService implements IRestaurantService {
         java.sql.Date now = new java.sql.Date(new java.util.Date().getTime());
         for (Discount d : item.getDiscounts()) {
             if (d == null) continue;
-            Timestamp start = d.getStartDate();
-            Timestamp end = d.getEndDate();
+            Date start = d.getStartDate();
+            Date end = d.getEndDate();
             if (start != null && end != null && !now.before(start) && !now.after(end)) {
                 double percentage = d.getDiscountPercentage();
                 double originalPrice = item.getPrice();

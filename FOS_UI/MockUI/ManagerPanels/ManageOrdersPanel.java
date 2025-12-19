@@ -1,7 +1,6 @@
 package FOS_UI.MockUI.ManagerPanels;
 
 import FOS_CORE.*;
-import FOS_UI.DialogUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,7 +56,7 @@ public class ManageOrdersPanel extends JPanel {
             refresh();
         } catch (Exception ex) {
             ex.printStackTrace();
-            DialogUtils.showError(this, "Failed to load orders: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Failed to load orders: " + ex.getMessage());
         }
     }
 
@@ -148,10 +147,10 @@ public class ManageOrdersPanel extends JPanel {
         try {
             IManagerService managerService = mainPanel.getManagerService();
             managerService.updateOrderStatus(order, newStatus.toString());
-            DialogUtils.showInfo(this, "Order status updated successfully.");
+            JOptionPane.showMessageDialog(this, "Order status updated successfully.");
         } catch (Exception ex) {
             ex.printStackTrace();
-            DialogUtils.showError(this, "Failed to update order status: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Failed to update order status: " + ex.getMessage());
             refresh();
         }
     }

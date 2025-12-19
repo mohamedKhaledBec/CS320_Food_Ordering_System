@@ -1,15 +1,13 @@
 package FOS_UI.MockUI.ManagerPanels;
 
-import FOS_CORE.Discount;
-import FOS_CORE.IManagerService;
+import FOS_CORE.*;
 import FOS_CORE.MenuItem;
-import FOS_UI.DialogUtils;
+import com.toedter.calendar.JDateChooser;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
+import java.util.Calendar;
 
 public class AddDiscountDialog extends JDialog {
     private MenuItem menuItem;
@@ -19,8 +17,8 @@ public class AddDiscountDialog extends JDialog {
     private JTextField nameField;
     private JTextField descriptionField;
     private JSpinner percentageSpinner;
-    private JSpinner startDateSpinner;
-    private JSpinner endDateSpinner;
+    private JDateChooser startDateChooser;
+    private JDateChooser endDateChooser;
 
     public AddDiscountDialog(JDialog parent, MenuItem menuItem, IManagerService managerService) {
         super(parent, "Add Discount", true);
@@ -45,8 +43,8 @@ public class AddDiscountDialog extends JDialog {
         JSpinner.NumberEditor editor = new JSpinner.NumberEditor(percentageSpinner, "0.0");
         percentageSpinner.setEditor(editor);
 
-        startDateSpinner = createDateSpinner();
-        endDateSpinner = createDateSpinner();
+        startDateChooser = new JDateChooser();
+        endDateChooser = new JDateChooser();
 
         formPanel.add(new JLabel("Discount Name:"));
         formPanel.add(nameField);
@@ -55,9 +53,9 @@ public class AddDiscountDialog extends JDialog {
         formPanel.add(new JLabel("Percentage:"));
         formPanel.add(percentageSpinner);
         formPanel.add(new JLabel("Start Date:"));
-        formPanel.add(startDateSpinner);
+        formPanel.add(startDateChooser);
         formPanel.add(new JLabel("End Date:"));
-        formPanel.add(endDateSpinner);
+        formPanel.add(endDateChooser);
 
         add(formPanel, BorderLayout.CENTER);
 
@@ -73,45 +71,33 @@ public class AddDiscountDialog extends JDialog {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    private JSpinner createDateSpinner() {
-        SpinnerDateModel dateModel = new SpinnerDateModel();
-        JSpinner spinner = new JSpinner(dateModel);
-        JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(spinner, "yyyy-MM-dd");
-        spinner.setEditor(dateEditor);
-        return spinner;
-    }
-
     private void onSave() {
         String name = nameField.getText().trim();
         String description = descriptionField.getText().trim();
         double percentage = (Double) percentageSpinner.getValue();
-        Date startDate = (Date) startDateSpinner.getValue();
-        Date endDate = (Date) endDateSpinner.getValue();
+
+
+        Date startDate = new Date(startDateChooser.getDate().getTime());
+        Date endDate = new Date(endDateChooser.getDate().getTime());
 
         if (name.isEmpty() || description.isEmpty()) {
-            DialogUtils.showError(this, "Please fill in all fields.");
+           JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (endDate.before(startDate)) {
-            DialogUtils.showError(this, "End date must be after start date.");
+            JOptionPane.showMessageDialog(this, "End date must be after start date.", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        resultDiscount = new Discount();
-        resultDiscount.setDiscountName(name);
-        resultDiscount.setDescription(description);
-        resultDiscount.setDiscountPercentage(percentage);
-        resultDiscount.setStartDate(new Timestamp(startDate.getTime()));
-        resultDiscount.setEndDate(new Timestamp(endDate.getTime()));
+        resultDiscount = new Discount(-1, name,description,percentage,startDate,endDate);
 
         try {
-            managerService.createDiscount(null, menuItem, description, percentage,
-                new Timestamp(startDate.getTime()), new Timestamp(endDate.getTime()));
+            managerService.createDiscount(menuItem, description, percentage, startDate, endDate);
             dispose();
         } catch (Exception ex) {
             ex.printStackTrace();
-            DialogUtils.showError(this, "Failed to add discount: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Failed to create discount: " + ex.getMessage());
         }
     }
 
