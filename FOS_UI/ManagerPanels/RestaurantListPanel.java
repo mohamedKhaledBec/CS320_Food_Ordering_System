@@ -1,5 +1,5 @@
 // java
-package FOS_UI.MockUI.ManagerPanels;
+package FOS_UI.ManagerPanels;
 
 import FOS_CORE.*;
 

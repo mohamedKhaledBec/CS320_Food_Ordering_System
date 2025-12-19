@@ -1,7 +1,6 @@
-package FOS_UI.MockUI;
+package FOS_UI;
 
 import FOS_CORE.*;
-import FOS_CORE.MenuItem;
 
 import javax.swing.*;
 import java.awt.*;

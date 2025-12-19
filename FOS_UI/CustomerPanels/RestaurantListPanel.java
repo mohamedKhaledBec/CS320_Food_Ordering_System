@@ -1,8 +1,7 @@
 // java
-package FOS_UI.MockUI.CustomerPanels;
+package FOS_UI.CustomerPanels;
 
 import FOS_CORE.*;
-import FOS_UI.MockUI.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,12 +1,9 @@
-package FOS_UI.MockUI.CustomerPanels;
+package FOS_UI.CustomerPanels;
 
 import FOS_CORE.*;
-import FOS_UI.MockUI.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class CheckoutDialog extends JDialog {

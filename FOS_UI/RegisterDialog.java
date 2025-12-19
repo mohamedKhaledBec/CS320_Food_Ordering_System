@@ -1,4 +1,4 @@
-package FOS_UI.MockUI;
+package FOS_UI;
 
 import FOS_CORE.*;
 

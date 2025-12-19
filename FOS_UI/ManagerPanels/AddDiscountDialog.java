@@ -1,4 +1,4 @@
-package FOS_UI.MockUI.ManagerPanels;
+package FOS_UI.ManagerPanels;
 
 import FOS_CORE.*;
 import FOS_CORE.MenuItem;
@@ -7,7 +7,6 @@ import com.toedter.calendar.JDateChooser;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Date;
-import java.util.Calendar;
 
 public class AddDiscountDialog extends JDialog {
     private MenuItem menuItem;

@@ -1,12 +1,11 @@
-package FOS_UI.MockUI;
+package FOS_UI;
 
 import FOS_CORE.*;
-import FOS_UI.MockUI.CustomerPanels.*;
-import FOS_UI.MockUI.ManagerPanels.*;
+import FOS_UI.CustomerPanels.*;
+import FOS_UI.ManagerPanels.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class MainFrame extends JFrame {
     private AccountService accountService;

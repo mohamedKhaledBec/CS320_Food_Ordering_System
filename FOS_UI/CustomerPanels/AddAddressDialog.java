@@ -1,4 +1,4 @@
-package FOS_UI.MockUI.CustomerPanels;
+package FOS_UI.CustomerPanels;
 
 import FOS_CORE.AccountService;
 import FOS_CORE.Address;

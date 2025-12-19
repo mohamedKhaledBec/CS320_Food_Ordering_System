@@ -1,10 +1,10 @@
-package FOS_UI.MockUI.ManagerPanels;
+package FOS_UI.ManagerPanels;
 
 import FOS_CORE.Manager;
 import FOS_CORE.ManagerService;
 import FOS_CORE.Restaurant;
 import FOS_CORE.RestaurantService;
-import FOS_UI.MockUI.MainFrame;
+import FOS_UI.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;

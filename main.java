@@ -1,8 +1,6 @@
-import FOS_DATA.DatabaseConnection;
-import FOS_UI.MockUI.*;
+import FOS_UI.MainFrame;
 
 import javax.swing.*;
-import java.sql.Connection;
 
 public class main {
         public static void main(String[] args) {
