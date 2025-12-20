@@ -2,7 +2,7 @@ package FOS_TEST.DATA_TESTS;
 
 import FOS_CORE.Card;
 import FOS_CORE.Customer;
-import FOS_DATA.CustomerService;
+import FOS_DATA.CustomerData;
 import org.junit.jupiter.api.*;
 import java.sql.Date;
 import java.util.ArrayList;
@@ -11,12 +11,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PaymentRepositoryTest {
 
-    private CustomerService customerService;
+    private CustomerData customerService;
     private Customer testCustomer;
 
     @BeforeEach
     void setUp() {
-        customerService = new CustomerService();
+        customerService = new CustomerData();
         
         // Use existing customer from database (ID 4 - customer.1@gmail.com)
         // This customer has at least one card in the database

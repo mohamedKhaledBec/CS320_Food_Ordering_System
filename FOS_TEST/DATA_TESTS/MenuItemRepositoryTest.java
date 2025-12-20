@@ -1,7 +1,7 @@
 package FOS_TEST.DATA_TESTS;
 
 import FOS_CORE.*;
-import FOS_DATA.ManagerService;
+import FOS_DATA.ManagerData;
 import FOS_DATA.RestaurantData;
 import org.junit.jupiter.api.*;
 import java.util.ArrayList;
@@ -9,13 +9,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MenuItemRepositoryTest {
 
-    private ManagerService managerService;
+    private ManagerData managerService;
     private RestaurantData restaurantData;
     private Restaurant testRestaurant;
 
     @BeforeEach
     void setUp() {
-        managerService = new ManagerService();
+        managerService = new ManagerData();
         restaurantData = new RestaurantData();
         
         // Use existing restaurant from database (ID 1 - Pizza Palace)

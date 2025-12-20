@@ -1,12 +1,13 @@
 package FOS_CORE;
 
+import FOS_DATA.ManagerData;
+
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class ManagerService implements IManagerService {
 
-    private final FOS_DATA.ManagerService DB = new FOS_DATA.ManagerService();
+    private final ManagerData DB = new ManagerData();
 
     @Override
     public ArrayList<Restaurant> getManagerRestaurants(Manager manager) {

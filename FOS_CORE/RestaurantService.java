@@ -1,8 +1,6 @@
 package FOS_CORE;
 
-import FOS_DATA.IManagerService;
 import FOS_DATA.IRestaurantData;
-import FOS_DATA.ManagerService;
 import FOS_DATA.RestaurantData;
 
 import java.sql.Date;

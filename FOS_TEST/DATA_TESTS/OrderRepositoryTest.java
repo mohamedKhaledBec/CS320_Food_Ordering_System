@@ -5,9 +5,8 @@ import FOS_CORE.CartItem;
 import FOS_CORE.Customer;
 import FOS_CORE.MenuItem;
 import FOS_CORE.OrderStatus;
-import FOS_CORE.Rating;
 import FOS_CORE.Restaurant;
-import FOS_DATA.CustomerService;
+import FOS_DATA.CustomerData;
 import FOS_DATA.RestaurantData;
 import org.junit.jupiter.api.*;
 import java.sql.Timestamp;
@@ -17,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class OrderRepositoryTest {
 
-    private CustomerService customerService;
+    private CustomerData customerService;
     private RestaurantData restaurantData;
     private Customer testCustomer;
     private Restaurant testRestaurant;
@@ -26,7 +25,7 @@ public class OrderRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        customerService = new CustomerService();
+        customerService = new CustomerData();
         restaurantData = new RestaurantData();
         
         // Use existing customer from database (ID 4 - customer.1@gmail.com)

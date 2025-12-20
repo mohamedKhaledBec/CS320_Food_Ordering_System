@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import FOS_CORE.*;
 import FOS_CORE.MenuItem;
 
-public interface IManagerService {
+public interface IManagerData {
 
     public boolean updateRestaurantInfo(Restaurant newRestaurantInfo);
 

@@ -1,7 +1,7 @@
 package FOS_TEST.DATA_TESTS;
 
 import FOS_CORE.*;
-import FOS_DATA.ManagerService;
+import FOS_DATA.ManagerData;
 import FOS_DATA.RestaurantData;
 import org.junit.jupiter.api.*;
 import java.sql.Date;
@@ -11,14 +11,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class DiscountRepositoryTest {
 
-    private ManagerService managerService;
+    private ManagerData managerService;
     private RestaurantData restaurantData;
     private Restaurant testRestaurant;
     private MenuItem testMenuItem;
 
     @BeforeEach
     void setUp() {
-        managerService = new ManagerService();
+        managerService = new ManagerData();
         restaurantData = new RestaurantData();
         
         // Create a test restaurant and menu item for testing

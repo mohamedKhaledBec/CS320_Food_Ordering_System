@@ -7,7 +7,7 @@ import FOS_DATA.*;
 public class AccountService implements IAccountService {
     private final IUserData userData = new UserData() ;
 
-    private final ICustomerService DB = new CustomerService() ;
+    private final ICustomerData DB = new CustomerData() ;
     // Working on it : Mohamed Khaled Becetti
     @Override
     public Customer createCustomerAccount(String email, String phone, String password, Address address) {

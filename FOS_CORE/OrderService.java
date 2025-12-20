@@ -5,7 +5,7 @@ import FOS_DATA.*;
 import java.util.ArrayList;
 
 public class OrderService implements IOrderService {
-    private final CustomerService DB = new CustomerService();
+    private final CustomerData DB = new CustomerData();
 
     @Override
     public void placeOrder(Customer customer,Address address, Order order, Restaurant restaurant) {

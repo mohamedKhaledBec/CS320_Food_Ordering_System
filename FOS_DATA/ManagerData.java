@@ -4,7 +4,7 @@ import FOS_CORE.*;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class ManagerService extends UserData implements IManagerService {
+public class ManagerData extends UserData implements IManagerData {
     public boolean updateRestaurantInfo(Restaurant newRestaurantInfo) {
         String sql = "UPDATE Restaurant SET name = ?, cuisine_type = ?, city = ? WHERE restaurant_id = ?";
         try (Connection connection = DatabaseConnection.getConnection();

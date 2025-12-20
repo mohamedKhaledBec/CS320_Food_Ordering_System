@@ -11,18 +11,18 @@ import FOS_CORE.MenuItem;
 import FOS_CORE.Order;
 import FOS_CORE.OrderStatus;
 import FOS_CORE.Restaurant;
+import FOS_DATA.ManagerData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Date;
-import java.sql.Date;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// Unit tests for the CORE ManagerService (data layer stubbed)
+// Unit tests for the CORE ManagerData (data layer stubbed)
 public class ManagerServiceTest {
 
 	private ManagerService service;
@@ -371,7 +371,7 @@ public class ManagerServiceTest {
 		}
 	}
 
-	private void injectDb(ManagerService target, FOS_DATA.ManagerService replacement) {
+	private void injectDb(ManagerService target, ManagerData replacement) {
 		setFinalField(target, "DB", replacement);
 	}
 
@@ -400,7 +400,7 @@ public class ManagerServiceTest {
 
 	// ---------- Stub ----------
 
-	private static class DbStub extends FOS_DATA.ManagerService {
+	private static class DbStub extends ManagerData {
 		boolean saveRestaurantInfoResult = true;
 		boolean addMenuItemResult = true;
 		boolean updateMenuItemResult = true;
