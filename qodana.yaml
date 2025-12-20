@@ -26,10 +26,9 @@ include:
   - name: ThrowablePrintStackTrace
   - name: FieldMayBeFinal
   - name: UNUSED_IMPORT
-exclude:
-  - name: All
-    paths:
-      - FOS_UI
-      - untitled
-      - untitled/src
-      - untitled/src/Main.java
+  - name: SizeReplaceableByIsEmpty
+  - name: UnnecessaryModifier
+
+
+
+
