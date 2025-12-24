@@ -78,7 +78,9 @@ public class EditMenuItemDialog extends JDialog {
         String desc = descriptionArea.getText().trim();
         String priceText = priceField.getText().trim();
 
-        if (!name.isEmpty() && !desc.isEmpty() && !priceText.isEmpty()) {
+        if (name.isEmpty() ||
+                desc.isEmpty() ||
+                priceText.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
         }

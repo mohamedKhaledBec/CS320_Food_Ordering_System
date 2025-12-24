@@ -106,9 +106,9 @@ public class ChangeRestaurantInfoPanel extends JPanel {
         String city = cityDropdown.getSelectedItem().toString();
         String cuisine = cuisineField.getText().trim();
 
-        if (!name.isEmpty() ||
-                !city.isEmpty() ||
-                !cuisine.isEmpty()) {
+        if (name.isEmpty() ||
+                city.isEmpty() ||
+                cuisine.isEmpty()) {
 
             JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Validation Error", JOptionPane.WARNING_MESSAGE);
             return;
